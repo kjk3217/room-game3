@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>국어퀴즈 방탈출 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="resume-screen" id="resumeScreen">
+            <h2>이어서 플레이하시겠어요?</h2>
+            <p>저장된 진행 상황이 있습니다.</p>
+            <button class="resume-btn" onclick="requestFullScreenAndResume()">이어서 하기</button>
+        </div>
+        <div class="screen-transition" id="screenTransition">
+            <video class="transition-video" id="transitionVideo" autoplay playsinline>
+                <source src="" type="video/mp4">
+            </video>
+        </div>
+
+        <div class="start-screen" id="startScreen">
+            <img src="images/logo.png" alt="게임 로고" class="game-logo">
+            <button class="start-btn" onclick="startGame()">START</button>
+        </div>
+
+        <div class="game-screen" id="gameScreen">
+            <div class="game-wrapper">
+                <div class="top-ui">
+                    <div class="progress" id="progress">0/12 완료</div>
+                    <div class="timer-container">
+                        <div class="timer" id="timer">10:00</div>
+                        <div class="timer-warning" id="timerWarning" style="display: none;">시간이 부족합니다!</div>
+                    </div>
+                    <div class="room-info" id="roomInfo">방 1</div>
+                </div>
+
+                <div class="room room1 active" id="room1">
+                    <div class="clickable tree" onclick="openQuiz(1)"></div>
+                    <div class="clickable jar" onclick="openQuiz(2)"></div>
+                    <div class="clickable candle" onclick="openQuiz(3)"></div>
+                    <div class="clickable door1" onclick="openQuiz(4)"></div>
+                </div>
+
+                <div class="room room2" id="room2">
+                    <div class="clickable hourglass" onclick="openQuiz(5)"></div>
+                    <div class="clickable box" onclick="openQuiz(6)"></div>
+                    <div class="clickable mask" onclick="openQuiz(7)"></div>
+                    <div class="clickable door2" onclick="openQuiz(8)"></div>
+                </div>
+
+                <div class="room room3" id="room3">
+                    <div class="clickable bible" onclick="openQuiz(9)"></div>
+                    <div class="clickable shield" onclick="openQuiz(10)"></div>
+                    <div class="clickable cross" onclick="openQuiz(11)"></div>
+                    <div class="clickable door3" onclick="openQuiz(12)"></div>
+                </div>
+            </div>
+            <button class="next-room-btn" id="nextRoomBtn" onclick="nextRoom()">다음 방으로</button>
+        </div>
+        <div class="game-over-screen" id="gameOverScreen">
+            <div class="game-over-content">
+                <h2>⏰ 시간 종료! ⏰</h2>
+                <p>제한시간이 초과되었습니다.</p>
+                <p>다시 도전해보세요!</p>
+                <button class="restart-btn" onclick="restartGame()">다시 시작</button>
+            </div>
+        </div>
+
+        <div class="ending-screen" id="endingScreen">
+            <div class="ending-content">
+                <h2>🎉 축하합니다! 🎉</h2>
+                <p>모든 퀴즈를 해결하고 성공적으로 탈출했습니다!</p>
+                <button class="restart-btn" onclick="restartGame()">다시 시작</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="quizModal">
+        <div class="modal-content">
+            <h3 id="quizTitle"></h3>
+            <p id="quizQuestion"></p>
+            <div id="quizInput"></div>
+            <div class="modal-buttons">
+                <button class="submit-btn" onclick="checkAnswer()">확인</button>
+                <button class="close-btn" onclick="closeModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
