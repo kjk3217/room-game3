@@ -145,11 +145,11 @@ function initializeSounds() {
         backgroundMusic = new Audio('sounds/ending_music.mp3');
         backgroundMusic.loop = true;
         backgroundMusic.volume = 0.6;
-        
+
         // 클릭 사운드 초기화
         clickSound = new Audio('sounds/click_sound.mp3');
         clickSound.volume = 0.8;
-        
+
         // 사운드 사전 로드
         const loadPromises = [
             new Promise((resolve, reject) => {
@@ -163,7 +163,7 @@ function initializeSounds() {
                 clickSound.load();
             })
         ];
-        
+
         Promise.all(loadPromises).then(() => {
             soundsLoaded = true;
             console.log('모든 사운드가 성공적으로 로드되었습니다.');
@@ -171,7 +171,7 @@ function initializeSounds() {
             console.log('사운드 로드 중 오류 발생:', error);
             soundsLoaded = false;
         });
-        
+
     } catch (error) {
         console.log('사운드 초기화 실패:', error);
         soundsLoaded = false;
@@ -222,7 +222,7 @@ function stopBackgroundMusic() {
 function startGame() {
     requestFullScreen(); // ✨ 시작 시 전체화면 요청
     console.log('게임 시작 버튼 클릭됨');
-    
+
     // 비디오 전환 사용 (텍스트 없이)
     showTransitionWithVideo('start', () => {
         document.getElementById('startScreen').classList.add('fade-out');
@@ -243,12 +243,12 @@ function startGame() {
 // ✨ 게임 이어하기 함수 (새로 추가) ✨
 function requestFullScreenAndResume() {
     requestFullScreen(); // 전체화면 요청
-    
+
     // 화면 전환
     const resumeScreen = document.getElementById('resumeScreen');
     resumeScreen.style.transition = 'opacity 0.5s ease';
     resumeScreen.style.opacity = '0';
-    
+
     setTimeout(() => {
         resumeScreen.style.display = 'none';
         document.getElementById('gameScreen').style.display = 'flex'; // ✨ flex로 변경
@@ -266,26 +266,26 @@ function requestFullScreenAndResume() {
 function initTimer() {
     // Web Audio API를 사용해 똑딱 소리 생성
     try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
+        const audioContext = new(window.AudioContext || window.webkitAudioContext)();
+
         function createTickSound() {
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
             oscillator.type = 'square';
-            
+
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-            
+
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.1);
         }
-        
+
         tickSound = createTickSound;
     } catch (error) {
         console.log('오디오 컨텍스트 생성 실패:', error);
@@ -296,16 +296,16 @@ function initTimer() {
 // 방 타이머 시작
 function startRoomTimer() {
     if (isTimerActive) return;
-    
+
     timeLeft = 600; // 10분 리셋
     isTimerActive = true;
     updateTimerDisplay();
     initTimer();
-    
+
     roomTimer = setInterval(() => {
         timeLeft--;
         updateTimerDisplay();
-        
+
         // 똑딱 소리 재생 (마지막 2분)
         if (timeLeft <= 120 && tickSound) {
             try {
@@ -314,12 +314,12 @@ function startRoomTimer() {
                 console.log('똑딱 소리 재생 실패:', error);
             }
         }
-        
+
         // 시간 경고
         if (timeLeft === 120) { // 2분 남음
             showTimerWarning();
         }
-        
+
         // 시간 종료
         if (timeLeft <= 0) {
             gameOver();
@@ -342,13 +342,13 @@ function updateTimerDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
     const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    
+
     const timerElement = document.getElementById('timer');
     timerElement.textContent = display;
-    
+
     // 타이머 색상 변경
     timerElement.classList.remove('warning', 'danger');
-    
+
     if (timeLeft <= 60) { // 1분 이하
         timerElement.classList.add('danger');
     } else if (timeLeft <= 120) { // 2분 이하
@@ -360,10 +360,6 @@ function updateTimerDisplay() {
 function showTimerWarning() {
     const warningElement = document.getElementById('timerWarning');
     warningElement.style.display = 'block';
-    
-    setTimeout(() => {
-        hideTimerWarning();
-    }, 5000); // 5초 후 숨김
 }
 
 // 타이머 경고 숨김
@@ -376,18 +372,18 @@ function hideTimerWarning() {
 function gameOver() {
     stopRoomTimer();
     stopBackgroundMusic(); // 배경음악 중지
-    
+
     // 모든 화면 숨김
     document.getElementById('gameScreen').style.display = 'none';
     document.getElementById('endingScreen').style.display = 'none';
     document.getElementById('startScreen').style.display = 'none';
-    
+
     // 게임오버 화면 표시
     document.getElementById('gameOverScreen').style.display = 'flex';
     setTimeout(() => {
         document.getElementById('gameOverScreen').classList.add('active');
     }, 100);
-    
+
     // 모달 닫기
     closeModal();
 }
@@ -397,13 +393,12 @@ function loadGameState() {
     const savedRoom = localStorage.getItem('currentRoom');
     if (savedRoom) {
         currentRoom = parseInt(savedRoom);
-        showRoom(currentRoom);
     }
-    
+    showRoom(currentRoom);
     completedQuizzes.forEach(quizId => {
         markQuizCompleted(quizId);
     });
-    
+
     checkRoomCompletion();
 }
 
@@ -411,40 +406,38 @@ function loadGameState() {
 function openQuiz(quizId) {
     // 클릭 사운드 재생
     playClickSound();
-    
+
     currentQuiz = quizId;
     const quiz = quizzes[quizId];
     const isCompleted = completedQuizzes.includes(quizId);
-    
-    // 👈 여기에 퀴즈별 모달 크기 설정 추가
+
     const modalContent = document.querySelector('.modal-content');
-    
+
     // 퀴즈 타입별로 크기 다르게 설정
     if (quiz.type === 'matching' || quiz.type === 'word_sort' || quiz.type === 'word_classification') {
-        modalContent.style.maxWidth = '1300px';  // 복잡한 퀴즈는 크게
+        modalContent.style.maxWidth = '1300px'; // 복잡한 퀴즈는 크게
         modalContent.style.width = '95%';
     } else if (quiz.type === 'four') {
-        modalContent.style.maxWidth = '1000px';   // 4개 입력은 중간
+        modalContent.style.maxWidth = '1000px'; // 4개 입력은 중간
         modalContent.style.width = '95%';
     } else if (quiz.type === 'single' || quiz.type === 'password') {
-        modalContent.style.maxWidth = '1000px';   // 단일 입력은 작게
+        modalContent.style.maxWidth = '1000px'; // 단일 입력은 작게
         modalContent.style.width = '95%';
     } else {
-        modalContent.style.maxWidth = '1000px';   // 기본 크기
+        modalContent.style.maxWidth = '1000px'; // 기본 크기
         modalContent.style.width = '95%';
     }
-    
-    document.getElementById('quizTitle').style.display = 'block'; // ✨ none -> block으로 수정
+
+    document.getElementById('quizTitle').style.display = 'block';
     document.getElementById('quizTitle').textContent = quiz.title;
     document.getElementById('quizQuestion').innerHTML = quiz.question;
-    
-    // 완료된 퀴즈인 경우 정답과 함께 표시
+
     if (isCompleted) {
         createCompletedQuizDisplay(quiz);
     } else {
         createQuizInput(quiz.type);
     }
-    
+
     document.getElementById('quizModal').style.display = 'flex';
 }
 
@@ -452,181 +445,24 @@ function openQuiz(quizId) {
 function createCompletedQuizDisplay(quiz) {
     const inputContainer = document.getElementById('quizInput');
     inputContainer.innerHTML = '';
-    
-    // 정답 표시 컨테이너 생성
+
     const answerContainer = document.createElement('div');
     answerContainer.className = 'completed-quiz-display';
-    
-    // 정답 제목
-    const answerTitle = document.createElement('h4');
-    answerTitle.textContent = '✅ 정답:';
-    answerTitle.style.color = '#00ff00';
-    answerTitle.style.marginBottom = '15px';
-    answerTitle.style.fontSize = '1.5rem';
-    answerContainer.appendChild(answerTitle);
-    
-    // 정답 내용 표시
-    if (quiz.type === 'matching') {
-        // 매칭 퀴즈 정답 표시
-        const matchingAnswerContainer = document.createElement('div');
-        matchingAnswerContainer.style.cssText = `
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-            margin-bottom: 20px;
-        `;
-        
-        Object.entries(quiz.correctMatches).forEach(([period, law]) => {
-            const matchItem = document.createElement('div');
-            matchItem.style.cssText = `
-                background: rgba(0,255,0,0.1);
-                border: 2px solid #00ff00;
-                border-radius: 8px;
-                padding: 12px;
-                text-align: center;
-                font-size: 1.2rem;
-                color: #00ff00;
-                font-weight: bold;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            `;
-            matchItem.innerHTML = `
-                <span>${period}</span>
-                <span style="color: #ffd700;">➜</span>
-                <span>${law}</span>
-            `;
-            matchingAnswerContainer.appendChild(matchItem);
-        });
-        
-        answerContainer.appendChild(matchingAnswerContainer);
-    } else if (quiz.type === 'word_sort') {
-        // 단어 정렬 퀴즈 정답 표시
-        const correctSentence = quiz.correctOrder.join(' ');
-        const answerBox = document.createElement('div');
-        answerBox.className = 'completed-answer-box';
-        answerBox.style.background = 'rgba(0,255,0,0.1)';
-        answerBox.style.border = '2px solid #00ff00';
-        answerBox.style.borderRadius = '8px';
-        answerBox.style.padding = '15px';
-        answerBox.style.textAlign = 'center';
-        answerBox.style.fontSize = '1.5rem';
-        answerBox.style.color = '#00ff00';
-        answerBox.style.fontWeight = 'bold';
-        answerBox.style.wordBreak = 'keep-all';
-        answerBox.style.lineHeight = '1.4';
-        answerBox.textContent = `"${correctSentence}"`;
-        answerContainer.appendChild(answerBox);
-    } else if (quiz.type === 'word_classification') {
-        // 단어 분류 퀴즈 정답 표시 추가
-        const classificationContainer = document.createElement('div');
-        classificationContainer.style.cssText = `
-            display: flex;
-            justify-content: space-around;
-            gap: 20px;
-            margin-bottom: 20px;
-        `;
 
-        Object.entries(quiz.correctClassification).forEach(([category, words]) => {
-            const categoryBox = document.createElement('div');
-            categoryBox.style.cssText = `
-                flex: 1;
-                background: rgba(0,255,0,0.1);
-                border: 2px solid #00ff00;
-                border-radius: 8px;
-                padding: 15px;
-            `;
+    answerContainer.innerHTML = `
+        <h4 style="color: #00ff00; margin-bottom: 15px; font-size: 1.5rem;">✅ 정답 확인</h4>
+        <p style="color: #ffd700; text-align: center; font-style: italic; margin-top: 15px; font-size: 1.1rem;">이미 해결한 문제입니다.</p>
+    `;
 
-            const categoryTitle = document.createElement('h5');
-            categoryTitle.textContent = category;
-            categoryTitle.style.cssText = `
-                color: #00ff00;
-                font-size: 1.4rem;
-                text-align: center;
-                margin-bottom: 10px;
-            `;
-            categoryBox.appendChild(categoryTitle);
-
-            words.forEach(word => {
-                const wordItem = document.createElement('div');
-                wordItem.textContent = word;
-                wordItem.style.cssText = `
-                    background: rgba(0,255,0,0.2);
-                    padding: 8px;
-                    text-align: center;
-                    border-radius: 5px;
-                    margin-top: 5px;
-                    font-size: 1.2rem;
-                    color: #fff;
-                `;
-                categoryBox.appendChild(wordItem);
-            });
-            classificationContainer.appendChild(categoryBox);
-        });
-        answerContainer.appendChild(classificationContainer);
-    } else if (quiz.type === 'four') {
-        // 4개 정답인 경우
-        const answersGrid = document.createElement('div');
-        answersGrid.className = 'completed-answers-grid';
-        answersGrid.style.display = 'grid';
-        answersGrid.style.gridTemplateColumns = '1fr 1fr';
-        answersGrid.style.gap = '10px';
-        answersGrid.style.marginBottom = '20px';
-        
-        quiz.answers.forEach((answer, index) => {
-            const answerBox = document.createElement('div');
-            answerBox.className = 'completed-answer-box';
-            answerBox.style.background = 'rgba(0,255,0,0.1)';
-            answerBox.style.border = '2px solid #00ff00';
-            answerBox.style.borderRadius = '8px';
-            answerBox.style.padding = '10px';
-            answerBox.style.textAlign = 'center';
-            answerBox.style.fontSize = '1.3rem';
-            answerBox.style.color = '#00ff00';
-            answerBox.style.fontWeight = 'bold';
-            answerBox.textContent = `${index + 1}. ${answer}`;
-            answersGrid.appendChild(answerBox);
-        });
-        
-        answerContainer.appendChild(answersGrid);
-    } else {
-        // 단일 정답인 경우
-        const answerBox = document.createElement('div');
-        answerBox.className = 'completed-answer-box';
-        answerBox.style.background = 'rgba(0,255,0,0.1)';
-        answerBox.style.border = '2px solid #00ff00';
-        answerBox.style.borderRadius = '8px';
-        answerBox.style.padding = '15px';
-        answerBox.style.textAlign = 'center';
-        answerBox.style.fontSize = '1.8rem';
-        answerBox.style.color = '#00ff00';
-        answerBox.style.fontWeight = 'bold';
-        answerBox.style.wordBreak = 'keep-all';
-        answerBox.style.lineHeight = '1.4';
-        answerBox.textContent = quiz.answers[0];
-        answerContainer.appendChild(answerBox);
-    }
-    
-    // 완료 표시
-    const completedMessage = document.createElement('p');
-    completedMessage.textContent = '이미 완료된 퀴즈입니다. 참고용으로 정답을 확인할 수 있습니다.';
-    completedMessage.style.color = '#ffd700';
-    completedMessage.style.textAlign = 'center';
-    completedMessage.style.fontStyle = 'italic';
-    completedMessage.style.marginTop = '15px';
-    completedMessage.style.fontSize = '1.1rem';
-    answerContainer.appendChild(completedMessage);
-    
     inputContainer.appendChild(answerContainer);
-    
-    // 버튼 영역 수정
+
     const submitBtn = document.querySelector('.submit-btn');
     const closeBtn = document.querySelector('.close-btn');
-    
+
     if (submitBtn) {
         submitBtn.style.display = 'none'; // 확인 버튼 숨기기
     }
-    
+
     if (closeBtn) {
         closeBtn.textContent = '확인';
         closeBtn.style.background = 'linear-gradient(45deg, #4caf50, #2e7d32)';
@@ -634,79 +470,54 @@ function createCompletedQuizDisplay(quiz) {
 }
 
 
-// 새로운 함수: 단어 분류 게임 생성 (4번 퀴즈용)
+// 새로운 함수: 단어 분류 게임 생성
 function createWordClassificationGame() {
     const inputContainer = document.getElementById('quizInput');
     inputContainer.innerHTML = '';
 
     const quiz = quizzes[currentQuiz];
 
-    // 게임 컨테이너 생성
     const gameContainer = document.createElement('div');
     gameContainer.className = 'word-classification-container';
 
-    // 1. 분류되지 않은 단어 영역
     const unclassifiedContainer = document.createElement('div');
     unclassifiedContainer.className = 'unclassified-words-container';
-    
+
     const instructionText = document.createElement('p');
     instructionText.textContent = '아래 단어들을 알맞은 곳으로 옮기세요.';
-    instructionText.style.cssText = `
-        text-align: center;
-        color: #ffd700;
-        font-size: 1.2rem;
-        width: 100%;
-        margin-bottom: 15px;
-    `;
+    instructionText.style.cssText = `text-align: center; color: #ffd700; font-size: 1.2rem; width: 100%; margin-bottom: 15px;`;
     unclassifiedContainer.appendChild(instructionText);
 
-    // 단어 요소들 생성 (섞어서)
     const shuffledWords = [...quiz.words].sort(() => Math.random() - 0.5);
     shuffledWords.forEach((word, index) => {
-        const wordElement = createWordElement(word, index); // 기존 함수 재활용
+        const wordElement = createWordElement(word, index);
         unclassifiedContainer.appendChild(wordElement);
     });
 
-    // 2. 분류 영역 (드롭존)
     const dropZonesContainer = document.createElement('div');
     dropZonesContainer.className = 'drop-zones-container';
-    dropZonesContainer.style.display = 'flex';
-    dropZonesContainer.style.gap = '20px';
-    dropZonesContainer.style.marginTop = '20px';
+    dropZonesContainer.style.cssText = `display: flex; gap: 20px; margin-top: 20px;`;
 
     quiz.categories.forEach(category => {
         const dropZone = document.createElement('div');
         dropZone.className = 'category-drop-zone';
         dropZone.dataset.category = category;
-
-        const title = document.createElement('h3');
-        title.textContent = category;
-        title.style.textAlign = 'center';
-        title.style.color = '#87ceeb';
-        title.style.marginBottom = '10px';
-        dropZone.appendChild(title);
-        
+        dropZone.innerHTML = `<h3 style="text-align: center; color: #87ceeb; margin-bottom: 10px;">${category}</h3>`;
         dropZonesContainer.appendChild(dropZone);
     });
 
-    // 컨테이너 조립
     gameContainer.appendChild(unclassifiedContainer);
     gameContainer.appendChild(dropZonesContainer);
     inputContainer.appendChild(gameContainer);
 
-    // 드롭 영역 설정 (unclassified 포함)
     setupDropZones(unclassifiedContainer, ...dropZonesContainer.querySelectorAll('.category-drop-zone'));
 }
 
 
-// =================================================================
-// ✨ 4번 문제 정답 확인 로직 수정 ✨
-// =================================================================
 function checkWordClassificationCompletion() {
     const quiz = quizzes[currentQuiz];
     const unclassifiedContainer = document.querySelector('.unclassified-words-container');
 
-    // 아직 옮겨야 할 단어가 남아있으면 확인하지 않음 (p 태그는 제외하고 계산)
     if (unclassifiedContainer.querySelectorAll('.word-element').length > 0) {
         return;
     }
@@ -714,143 +525,74 @@ function checkWordClassificationCompletion() {
     let allCorrect = true;
     document.querySelectorAll('.category-drop-zone').forEach(zone => {
         const category = zone.dataset.category;
-        const correctWordsForCategory = quiz.correctClassification[category];
-        const wordsInZone = Array.from(zone.querySelectorAll('.word-element')).map(el => el.dataset.word);
+        const correctWordsForCategory = [...quiz.correctClassification[category]].sort();
+        const wordsInZone = Array.from(zone.querySelectorAll('.word-element')).map(el => el.dataset.word).sort();
 
-        if (wordsInZone.length !== correctWordsForCategory.length) {
+        if (JSON.stringify(correctWordsForCategory) !== JSON.stringify(wordsInZone)) {
             allCorrect = false;
-        } else {
-            const sortedWordsInZone = [...wordsInZone].sort();
-            const sortedCorrectWords = [...correctWordsForCategory].sort();
-            for (let i = 0; i < sortedWordsInZone.length; i++) {
-                if (sortedWordsInZone[i] !== sortedCorrectWords[i]) {
-                    allCorrect = false;
-                    break;
-                }
-            }
         }
     });
 
-    // 모든 단어가 올바른 위치에 놓였을 때만 실행
     if (allCorrect) {
-        // 정답 시각적 효과 (7번 문제와 동일하게)
         const wordElements = document.querySelectorAll('.category-drop-zone .word-element');
         wordElements.forEach((el, index) => {
             setTimeout(() => {
                 el.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
                 el.style.transform = 'scale(1.05)';
-                setTimeout(() => {
-                    el.style.transform = 'scale(1)';
-                }, 200);
+                setTimeout(() => { el.style.transform = 'scale(1)'; }, 200);
             }, index * 100);
         });
-        
-        // 애니메이션이 끝난 후 정답 처리
-        setTimeout(() => {
-            correctAnswer();
-        }, wordElements.length * 100 + 500);
+
+        setTimeout(correctAnswer, wordElements.length * 100 + 500);
     }
-    // 오답일 경우: 아무런 메시지나 효과 없이 사용자가 재배치하도록 둡니다.
 }
-// =================================================================
 
 
 // 매칭 게임 생성
 function createMatchingGame() {
     const inputContainer = document.getElementById('quizInput');
     inputContainer.innerHTML = '';
-    
+
     const quiz = quizzes[currentQuiz];
-    
-    // 게임 컨테이너 생성
+
     const gameContainer = document.createElement('div');
     gameContainer.className = 'matching-game-container';
-    gameContainer.style.cssText = `
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* ✨ 1fr 50px 1fr -> 1fr 1fr */
-        gap: 20px;
-        max-width: 1200px;
-        margin: 0 auto;
-        align-items: start;
-    `;
-    
-    // 좌측 시대 컨테이너
+    gameContainer.style.cssText = `display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; align-items: start;`;
+
     const periodsContainer = document.createElement('div');
     periodsContainer.className = 'periods-container';
-    periodsContainer.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    `;
-    
-    // 우측 법 컨테이너
+    periodsContainer.style.cssText = `display: flex; flex-direction: column; gap: 15px;`;
+
     const lawsContainer = document.createElement('div');
     lawsContainer.className = 'laws-container';
-    lawsContainer.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    `;
-    
-   // 오른쪽 선택지 순서를 섞어줍니다.
+    lawsContainer.style.cssText = `display: flex; flex-direction: column; gap: 15px;`;
+
     const shuffledLaws = [...quiz.laws].sort(() => Math.random() - 0.5);
-    
-    // 시대 요소들 생성
-    quiz.periods.forEach((period, index) => {
+
+    quiz.periods.forEach(period => {
         const periodItem = document.createElement('div');
         periodItem.className = 'period-item';
         periodItem.dataset.period = period;
         periodItem.textContent = period;
-        
-        periodItem.style.cssText = `
-            background: linear-gradient(135deg, #8e24aa, #5e35b1);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        `;
-        
+        periodItem.style.cssText = `background: linear-gradient(135deg, #8e24aa, #5e35b1); color: white; padding: 15px; border-radius: 10px; font-weight: bold; text-align: center; cursor: pointer; border: 3px solid transparent; transition: all 0.3s ease; font-size: 1.2rem;`;
         periodItem.addEventListener('click', () => selectPeriod(periodItem));
         periodsContainer.appendChild(periodItem);
     });
-    
-    // 법 요소들 생성 (섞인 순서로)
-    shuffledLaws.forEach((law, index) => {
+
+    shuffledLaws.forEach(law => {
         const lawItem = document.createElement('div');
         lawItem.className = 'law-item';
         lawItem.dataset.law = law;
         lawItem.textContent = law;
-        
-        lawItem.style.cssText = `
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        `;
-        
+        lawItem.style.cssText = `background: linear-gradient(135deg, #4a90e2, #357abd); color: white; padding: 15px; border-radius: 10px; font-weight: bold; text-align: center; cursor: pointer; border: 3px solid transparent; transition: all 0.3s ease; font-size: 1.2rem;`;
         lawItem.addEventListener('click', () => selectLaw(lawItem));
         lawsContainer.appendChild(lawItem);
     });
-    
-    
-    // 컨테이너 조립
+
     gameContainer.appendChild(periodsContainer);
     gameContainer.appendChild(lawsContainer);
-    
     inputContainer.appendChild(gameContainer);
-    
-    // 전역 변수 초기화
+
     window.selectedPeriod = null;
     window.currentMatches = {};
     window.correctMatches = quiz.correctMatches;
@@ -860,114 +602,84 @@ function createMatchingGame() {
 function createWordSortGame() {
     const inputContainer = document.getElementById('quizInput');
     inputContainer.innerHTML = '';
-    
+
     const quiz = quizzes[currentQuiz];
-    
-    // 게임 컨테이너 생성
+
     const gameContainer = document.createElement('div');
     gameContainer.className = 'word-sort-game-container';
-    gameContainer.style.cssText = `
-        max-width: 900px;
-        margin: 0 auto;
-    `;
-    
-    // 설명 텍스트
+    gameContainer.style.cssText = `max-width: 900px; margin: 0 auto;`;
+
     const instructionText = document.createElement('p');
     instructionText.textContent = '단어를 드래그하여 올바른 순서로 배열하세요.';
-    instructionText.style.cssText = `
-        text-align: center;
-        color: #ffd700;
-        font-size: 1.2rem;
-        margin-bottom: 30px;
-        font-style: italic;
-    `;
-    
-    // 뒤섞인 단어들 컨테이너
+    instructionText.style.cssText = `text-align: center; color: #ffd700; font-size: 1.2rem; margin-bottom: 30px; font-style: italic;`;
+
     const shuffledContainer = document.createElement('div');
     shuffledContainer.className = 'shuffled-words-container';
-    
-    // 정답 영역 컨테이너
+
     const answerContainer = document.createElement('div');
     answerContainer.className = 'answer-words-container';
-   
-   
-   // 단어 요소들 생성 (섞인 순서로)
-   const shuffledWords = [...quiz.shuffledWords].sort(() => Math.random() - 0.5);
-   
-   shuffledWords.forEach((word, index) => {
-       const wordElement = createWordElement(word, index);
-       shuffledContainer.appendChild(wordElement);
-   });
-   
-   // 컨테이너 조립
-   gameContainer.appendChild(instructionText);
-   gameContainer.appendChild(shuffledContainer);
-   gameContainer.appendChild(answerContainer);
-   
-   inputContainer.appendChild(gameContainer);
-   
-   // 드롭 영역 설정
-   setupDropZones(shuffledContainer, answerContainer);
-   
-   // 전역 변수 초기화
-   window.currentWordOrder = [];
-   window.correctWordOrder = quiz.correctOrder;
+
+    const shuffledWords = [...quiz.shuffledWords].sort(() => Math.random() - 0.5);
+
+    shuffledWords.forEach((word, index) => {
+        const wordElement = createWordElement(word, index);
+        shuffledContainer.appendChild(wordElement);
+    });
+
+    gameContainer.appendChild(instructionText);
+    gameContainer.appendChild(shuffledContainer);
+    gameContainer.appendChild(answerContainer);
+    inputContainer.appendChild(gameContainer);
+
+    setupDropZones(shuffledContainer, answerContainer);
+
+    window.correctWordOrder = quiz.correctOrder;
 }
 
 // 단어 요소 생성
 function createWordElement(word, index) {
-   const wordElement = document.createElement('div');
-   wordElement.className = 'word-element';
-   wordElement.dataset.word = word;
-   wordElement.dataset.index = index;
-   wordElement.textContent = word;
-   wordElement.draggable = true;
-   
-   // 드래그 이벤트 리스너
-   wordElement.addEventListener('dragstart', handleDragStart);
-   wordElement.addEventListener('dragend', handleDragEnd);
-   
-   // 모바일 터치 지원
-   wordElement.addEventListener('touchstart', handleTouchStart, { passive: false });
-   wordElement.addEventListener('touchmove', handleTouchMove, { passive: false });
-   wordElement.addEventListener('touchend', handleTouchEnd, { passive: false });
-   
-   return wordElement;
+    const wordElement = document.createElement('div');
+    wordElement.className = 'word-element';
+    wordElement.dataset.word = word;
+    wordElement.dataset.index = index;
+    wordElement.textContent = word;
+    wordElement.draggable = true;
+
+    wordElement.addEventListener('dragstart', handleDragStart);
+    wordElement.addEventListener('dragend', handleDragEnd);
+    wordElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+    wordElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+    wordElement.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return wordElement;
 }
 
 // 드롭 영역 설정 (가변 인자 ...containers 사용)
 function setupDropZones(...containers) {
-   containers.forEach(container => {
-       if (container) {
+    containers.forEach(container => {
+        if (container) {
             container.addEventListener('dragover', handleDragOver);
             container.addEventListener('drop', handleDrop);
-       }
-   });
+        }
+    });
 }
 
 
 // 드래그 시작
 function handleDragStart(e) {
-   // 드래그하는 요소의 원래 인덱스를 데이터로 전달
-   e.dataTransfer.setData('text/plain', e.target.dataset.index);
-   e.target.classList.add('dragging'); // Use class for visual feedback
+    e.dataTransfer.setData('text/plain', e.target.dataset.index);
+    e.target.classList.add('dragging');
 }
 
 // 드래그 종료
 function handleDragEnd(e) {
-   e.target.classList.remove('dragging');
+    e.target.classList.remove('dragging');
 }
 
 
 // 드래그 오버
 function handleDragOver(e) {
-   e.preventDefault();
-   // 드롭 영역에 따라 다른 배경색 피드백
-   if (e.currentTarget.classList.contains('answer-words-container') || e.currentTarget.classList.contains('category-drop-zone')) {
-        e.currentTarget.style.background = 'rgba(0,150,0,0.3)';
-   } else {
-        e.currentTarget.style.background = 'rgba(0,0,0,0.4)';
-   }
+    e.preventDefault();
 }
 
 // 드롭 처리
@@ -975,73 +687,37 @@ function handleDrop(e) {
     e.preventDefault();
     const draggedIndex = e.dataTransfer.getData('text/plain');
     const draggedElement = document.querySelector(`.word-element[data-index='${draggedIndex}']`);
-    
-    if (draggedElement && e.currentTarget !== draggedElement.parentNode) {
-        // p 태그는 옮겨지지 않도록 예외 처리
-        if (draggedElement.tagName.toLowerCase() !== 'p') {
-            e.currentTarget.appendChild(draggedElement);
-        }
-        
-        // 현재 퀴즈 타입에 따라 다른 완료 체크 함수 호출
-        const quizType = quizzes[currentQuiz].type;
-        if (quizType === 'word_sort') {
-            checkWordSortCompletion();
-        } else if (quizType === 'word_classification') {
-            checkWordClassificationCompletion();
-        }
-    }
-    
-    // 배경색 복원
-    resetDropZoneBackground(e.currentTarget);
-}
 
-// 드롭 영역 배경색 복원
-function resetDropZoneBackground(container) {
-    if (container.classList.contains('answer-words-container') || container.classList.contains('category-drop-zone')) {
-        container.style.background = 'rgba(0,100,0,0.2)';
-    } else if (container.classList.contains('unclassified-words-container')) {
-        container.style.background = 'rgba(0,0,0,0.3)';
-    } else {
-        container.style.background = 'rgba(0,0,0,0.3)';
+    if (draggedElement && e.currentTarget.contains(draggedElement) === false) {
+        e.currentTarget.appendChild(draggedElement);
+    }
+
+    const quizType = quizzes[currentQuiz].type;
+    if (quizType === 'word_sort') {
+        checkWordSortCompletion();
+    } else if (quizType === 'word_classification') {
+        checkWordClassificationCompletion();
     }
 }
 
 
 // === ✨ 터치 이벤트 핸들러 개선 ✨ ===
 let draggedTouchElement = null;
-let touchOffsetX = 0;
-let touchOffsetY = 0;
 
 function handleTouchStart(e) {
     e.preventDefault();
     draggedTouchElement = e.target;
-    const touch = e.touches[0];
-    const rect = e.target.getBoundingClientRect();
-
-    // 터치가 요소의 어디에서 시작되었는지 계산
-    touchOffsetX = touch.clientX - rect.left;
-    touchOffsetY = touch.clientY - rect.top;
-
-    // 드래그 중인 요소에 스타일 적용
     draggedTouchElement.classList.add('touch-dragging');
-    // 초기 위치 설정 (깜빡임 방지)
-    draggedTouchElement.style.left = `${rect.left}px`;
-    draggedTouchElement.style.top = `${rect.top}px`;
-
-    // 드래그 중 페이지 스크롤 방지
     document.body.style.overflow = 'hidden';
 }
 
 function handleTouchMove(e) {
     e.preventDefault();
     if (!draggedTouchElement) return;
-    
+
     const touch = e.touches[0];
-    // 터치 위치에 따라 요소 위치 업데이트
-    const x = touch.clientX - touchOffsetX;
-    const y = touch.clientY - touchOffsetY;
-    draggedTouchElement.style.left = `${x}px`;
-    draggedTouchElement.style.top = `${y}px`;
+    draggedTouchElement.style.left = `${touch.clientX - (draggedTouchElement.offsetWidth / 2)}px`;
+    draggedTouchElement.style.top = `${touch.clientY - (draggedTouchElement.offsetHeight / 2)}px`;
 }
 
 function handleTouchEnd(e) {
@@ -1049,27 +725,20 @@ function handleTouchEnd(e) {
     if (!draggedTouchElement) return;
 
     const touch = e.changedTouches[0];
-
-    // 드롭 위치의 요소를 찾기 위해 잠시 숨김
     draggedTouchElement.style.display = 'none';
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
     draggedTouchElement.style.display = '';
 
-    // 가장 가까운 드롭 컨테이너 찾기
     const dropContainer = elementBelow?.closest('.shuffled-words-container, .answer-words-container, .category-drop-zone, .unclassified-words-container');
 
-    // 스타일 초기화
     draggedTouchElement.classList.remove('touch-dragging');
     draggedTouchElement.style.left = '';
     draggedTouchElement.style.top = '';
-    document.body.style.overflow = ''; // 페이지 스크롤 복원
+    document.body.style.overflow = '';
 
-    if (dropContainer && dropContainer !== draggedTouchElement.parentNode) {
-        if (draggedTouchElement.tagName.toLowerCase() !== 'p') {
-            dropContainer.appendChild(draggedTouchElement);
-        }
-        
-        // 퀴즈 완료 여부 확인
+    if (dropContainer && !dropContainer.contains(draggedTouchElement)) {
+        dropContainer.appendChild(draggedTouchElement);
+
         const quizType = quizzes[currentQuiz].type;
         if (quizType === 'word_sort') {
             checkWordSortCompletion();
@@ -1085,870 +754,462 @@ function handleTouchEnd(e) {
 
 // 단어 정렬 완료 확인
 function checkWordSortCompletion() {
-   const answerContainer = document.querySelector('.answer-words-container');
-   const wordsInAnswer = Array.from(answerContainer.querySelectorAll('.word-element'))
-       .map(el => el.dataset.word);
-   
-   // 모든 단어가 정답 영역에 있는지 확인
-   if (wordsInAnswer.length === window.correctWordOrder.length) {
-       // 순서가 맞는지 확인
-       const isCorrectOrder = wordsInAnswer.every((word, index) => 
-           word === window.correctWordOrder[index]
-       );
-       
-       if (isCorrectOrder) {
-           // 정답 시각적 효과
-           const wordElements = answerContainer.querySelectorAll('.word-element');
-           wordElements.forEach((el, index) => {
-               setTimeout(() => {
-                   el.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
-                   el.style.transform = 'scale(1.05)';
-                   setTimeout(() => {
-                       el.style.transform = 'scale(1)';
-                   }, 200);
-               }, index * 100);
-           });
-           
-           setTimeout(() => {
-               correctAnswer();
-           }, wordsInAnswer.length * 100 + 500);
-       }
-   }
+    const answerContainer = document.querySelector('.answer-words-container');
+    const wordsInAnswer = Array.from(answerContainer.querySelectorAll('.word-element'))
+        .map(el => el.dataset.word);
+    const correctOrder = window.correctWordOrder;
+
+    if (wordsInAnswer.length === correctOrder.length && JSON.stringify(wordsInAnswer) === JSON.stringify(correctOrder)) {
+        const wordElements = answerContainer.querySelectorAll('.word-element');
+        wordElements.forEach((el, index) => {
+            setTimeout(() => {
+                el.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
+                el.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    el.style.transform = 'scale(1)';
+                }, 200);
+            }, index * 100);
+        });
+
+        setTimeout(correctAnswer, wordsInAnswer.length * 100 + 500);
+    }
 }
 
 // 시대 선택
 function selectPeriod(periodElement) {
-   // 이전 선택 해제
-   document.querySelectorAll('.period-item').forEach(item => {
-       item.style.borderColor = 'transparent';
-       item.style.boxShadow = 'none';
-   });
-   
-   // 새로운 선택
-   window.selectedPeriod = periodElement.dataset.period;
-   periodElement.style.borderColor = '#ffd700';
-   periodElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.6)';
+    document.querySelectorAll('.period-item').forEach(item => {
+        item.style.borderColor = 'transparent';
+        item.style.boxShadow = 'none';
+    });
+
+    window.selectedPeriod = periodElement.dataset.period;
+    periodElement.style.borderColor = '#ffd700';
+    periodElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.6)';
 }
 
 // 법 선택 및 매칭
 function selectLaw(lawElement) {
-   if (!window.selectedPeriod) {
-       showMessage("먼저 왼쪽 항목을 선택해주세요!");
-       return;
-   }
-   
-   const selectedLaw = lawElement.dataset.law;
-   
-   // 매칭 처리
-   window.currentMatches[window.selectedPeriod] = selectedLaw;
-   
-   // 시각적 피드백
-   const isCorrect = window.correctMatches[window.selectedPeriod] === selectedLaw;
-   
-   if (isCorrect) {
-       // 정답인 경우
-       lawElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
-       lawElement.style.borderColor = '#00ff00';
-       lawElement.style.pointerEvents = 'none'; // 다시 선택 불가
-       
-       // 해당 시대도 녹색으로
-       const periodElement = document.querySelector(`[data-period="${window.selectedPeriod}"]`);
-       periodElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
-       periodElement.style.borderColor = '#00ff00';
-       periodElement.style.pointerEvents = 'none'; // 다시 선택 불가
-       
-       // 연결선 효과 (선택사항)
-       createConnectionLine(periodElement, lawElement);
-   } else {
-       // 오답인 경우
-       lawElement.style.background = 'linear-gradient(135deg, #f44336, #c62828)';
-       setTimeout(() => {
-           lawElement.style.background = 'linear-gradient(135deg, #4a90e2, #357abd)';
-       }, 1000);
-       
-       delete window.currentMatches[window.selectedPeriod];
-   }
-   
-   // 선택 상태 초기화
-   document.querySelectorAll('.period-item').forEach(item => {
-       if (!item.style.pointerEvents || item.style.pointerEvents === 'auto') {
-            item.style.borderColor = 'transparent';
-            item.style.boxShadow = 'none';
-       }
-   });
-   window.selectedPeriod = null;
-   
-   // 모든 매칭 완료 확인
-   if (Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
-       setTimeout(() => {
-           checkMatchingComplete();
-       }, 500);
-   }
-}
+    if (!window.selectedPeriod) {
+        showMessage("먼저 왼쪽 항목을 선택해주세요!");
+        return;
+    }
 
-// 연결선 생성 (시각적 효과)
-function createConnectionLine(periodElement, lawElement) {
-   // 간단한 연결 표시 - 체크마크로 대체
-   const checkMark = document.createElement('div');
-   checkMark.textContent = '✓';
-   checkMark.style.cssText = `
-       position: absolute;
-       top: 50%;
-       left: 50%;
-       transform: translate(-50%, -50%);
-       color: #00ff00;
-       font-size: 2rem;
-       font-weight: bold;
-       z-index: 100;
-       animation: checkmarkPop 0.5s ease-out;
-       pointer-events: none;
-   `;
-   
-   periodElement.style.position = 'relative';
-   periodElement.appendChild(checkMark);
-   
-   // 애니메이션 키프레임 추가
-   if (!document.querySelector('#checkmarkAnimation')) {
-       const style = document.createElement('style');
-       style.id = 'checkmarkAnimation';
-       style.textContent = \`
-           @keyframes checkmarkPop {
-               0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-               50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-               100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-           }
-       \`;
-       document.head.appendChild(style);
-   }
+    const selectedLaw = lawElement.dataset.law;
+    window.currentMatches[window.selectedPeriod] = selectedLaw;
+
+    const isCorrect = window.correctMatches[window.selectedPeriod] === selectedLaw;
+
+    if (isCorrect) {
+        lawElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
+        lawElement.style.pointerEvents = 'none';
+
+        const periodElement = document.querySelector(`[data-period="${window.selectedPeriod}"]`);
+        periodElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
+        periodElement.style.pointerEvents = 'none';
+
+    } else {
+        lawElement.style.background = 'linear-gradient(135deg, #f44336, #c62828)';
+        setTimeout(() => {
+            lawElement.style.background = 'linear-gradient(135deg, #4a90e2, #357abd)';
+        }, 1000);
+        delete window.currentMatches[window.selectedPeriod];
+    }
+    
+    document.querySelector(`[data-period="${window.selectedPeriod}"]`).style.borderColor = 'transparent';
+    window.selectedPeriod = null;
+
+    if (Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
+        setTimeout(checkMatchingComplete, 500);
+    }
 }
 
 // 매칭 완료 확인
 function checkMatchingComplete() {
-   let allCorrect = true;
-   
-   for (const [period, law] of Object.entries(window.currentMatches)) {
-       if (window.correctMatches[period] !== law) {
-           allCorrect = false;
-           break;
-       }
-   }
-   
-   if (allCorrect && Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
-       correctAnswer();
-   }
+    let allCorrect = Object.keys(window.correctMatches).every(period => 
+        window.currentMatches[period] === window.correctMatches[period]
+    );
+
+    if (allCorrect) {
+        correctAnswer();
+    }
 }
 
 // 퀴즈 입력 필드 생성
 function createQuizInput(type) {
-   const inputContainer = document.getElementById('quizInput');
-   inputContainer.innerHTML = '';
-   
-   if (type === 'single' || type === 'password') {
-       const input = document.createElement('input');
-       input.type = 'text';
-       input.id = 'quizAnswer';
-       input.placeholder = '정답을 입력하세요...';
-       input.addEventListener('keypress', function(e) {
-           if (e.key === 'Enter') checkAnswer();
-       });
-       inputContainer.appendChild(input);
-       setTimeout(() => input.focus(), 100);
-   } else if (type === 'four') {
-       const container = document.createElement('div');
-       container.className = 'four-inputs';
-       for (let i = 1; i <= 2; i++) { // ✨ 4 -> 2로 수정 (2개 입력칸만 생성)
-           const input = document.createElement('input');
-           input.type = 'text';
-           input.id = \`answer\${i}\`;
-           input.placeholder = \`\${i}번 정답\`;
-           input.addEventListener('keypress', function(e) {
-               if (e.key === 'Enter') checkAnswer();
-           });
-           container.appendChild(input);
-       }
-       inputContainer.appendChild(container);
-       setTimeout(() => document.getElementById('answer1').focus(), 100);
-   } else if (type === 'matching') {
-       createMatchingGame();
-   } else if (type === 'word_sort') {
-       createWordSortGame();
-   } else if (type === 'word_classification') { // 새 퀴즈 유형 추가
-       createWordClassificationGame();
-   } else if (type === 'textarea') {
-       const textarea = document.createElement('textarea');
-       textarea.id = 'quizAnswer';
-       textarea.placeholder = '정답을 정확히 입력하세요...';
-       textarea.addEventListener('keypress', function(e) {
-           if (e.key === 'Enter' && !e.shiftKey) {
-               e.preventDefault();
-               checkAnswer();
-           }
-       });
-       inputContainer.appendChild(textarea);
-       setTimeout(() => textarea.focus(), 100);
-   }
-   
-   // 버튼 영역 원상복구
-   const submitBtn = document.querySelector('.submit-btn');
-   const closeBtn = document.querySelector('.close-btn');
-   
-   if (submitBtn) {
-       submitBtn.style.display = 'inline-block';
-   }
-   
-   if (closeBtn) {
-       closeBtn.textContent = '닫기';
-       closeBtn.style.background = 'linear-gradient(45deg, #f44336, #c62828)';
-   }
+    const inputContainer = document.getElementById('quizInput');
+    inputContainer.innerHTML = '';
+
+    if (type === 'single' || type === 'password') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'quizAnswer';
+        input.placeholder = '정답을 입력하세요...';
+        input.addEventListener('keypress', e => { if (e.key === 'Enter') checkAnswer(); });
+        inputContainer.appendChild(input);
+        setTimeout(() => input.focus(), 100);
+    } else if (type === 'four') {
+        const container = document.createElement('div');
+        container.className = 'four-inputs';
+        for (let i = 1; i <= 2; i++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = `answer${i}`;
+            input.placeholder = `${i}번 정답`;
+            input.addEventListener('keypress', e => { if (e.key === 'Enter') checkAnswer(); });
+            container.appendChild(input);
+        }
+        inputContainer.appendChild(container);
+        setTimeout(() => document.getElementById('answer1').focus(), 100);
+    } else if (type === 'matching') {
+        createMatchingGame();
+    } else if (type === 'word_sort') {
+        createWordSortGame();
+    } else if (type === 'word_classification') {
+        createWordClassificationGame();
+    }
+
+    const submitBtn = document.querySelector('.submit-btn');
+    const closeBtn = document.querySelector('.close-btn');
+    if (submitBtn) submitBtn.style.display = 'inline-block';
+    if (closeBtn) {
+        closeBtn.textContent = '닫기';
+        closeBtn.style.background = 'linear-gradient(45deg, #f44336, #c62828)';
+    }
 }
 
-// 정답 확인 - 마지막 퀴즈(12번) 처리 수정
+// 정답 확인
 function checkAnswer() {
-   const quiz = quizzes[currentQuiz];
-   let userAnswer = '';
-   
-    // 드래그 앤 드롭 퀴즈는 자동 체크되므로 여기서는 처리하지 않음
-   if (quiz.type === 'matching' || quiz.type === 'word_sort' || quiz.type === 'word_classification') {
-       return;
-   } else if (quiz.type === 'four') {
-       const answers = [];
-       for (let i = 1; i <= 2; i++) { // ✨ 4 -> 2로 수정
-           const value = document.getElementById(\`answer\${i}\`).value.trim();
-           answers.push(value);
-       }
-       
-       const correctAnswers = quiz.answers;
-       let isCorrect = true;
-       
-       for (let i = 0; i < 2; i++) { // ✨ 4 -> 2로 수정
-           if (normalizeAnswer(answers[i]) !== normalizeAnswer(correctAnswers[i])) {
-               isCorrect = false;
-               break;
-           }
-       }
-       
-       if (isCorrect) {
-           correctAnswer();
-       } else {
-           wrongAnswer();
-       }
-       return;
-   } else {
-       userAnswer = document.getElementById('quizAnswer').value.trim();
-   }
-   
-   const normalizedAnswer = normalizeAnswer(userAnswer);
-   const isCorrect = quiz.answers.some(answer => 
-       normalizeAnswer(answer) === normalizedAnswer
-   );
-   
-   if (isCorrect) {
-       // 마지막 퀴즈(12번)인 경우 특별한 처리
-       if (currentQuiz === 12) {
-           correctAnswerForFinalQuiz();
-       } else {
-           correctAnswer();
-       }
-   } else {
-       wrongAnswer();
-   }
+    const quiz = quizzes[currentQuiz];
+    let isCorrect = false;
+
+    if (['matching', 'word_sort', 'word_classification'].includes(quiz.type)) return;
+
+    if (quiz.type === 'four') {
+        const answer1 = document.getElementById('answer1').value.trim();
+        const answer2 = document.getElementById('answer2').value.trim();
+        isCorrect = normalizeAnswer(answer1) === normalizeAnswer(quiz.answers[0]) &&
+                    normalizeAnswer(answer2) === normalizeAnswer(quiz.answers[1]);
+    } else {
+        const userAnswer = document.getElementById('quizAnswer').value.trim();
+        isCorrect = quiz.answers.some(answer => normalizeAnswer(answer) === normalizeAnswer(userAnswer));
+    }
+
+    if (isCorrect) {
+        if (currentQuiz === 12) {
+            correctAnswerForFinalQuiz();
+        } else {
+            correctAnswer();
+        }
+    } else {
+        wrongAnswer();
+    }
 }
 
-// 마지막 퀴즈 정답 처리 - 수정됨 (축하 메시지 제거, 바로 엔딩)
+// 마지막 퀴즈 정답 처리
 function correctAnswerForFinalQuiz() {
-   // 먼저 정답 처리
-   completedQuizzes.push(currentQuiz);
-   localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
-   
-   markQuizCompleted(currentQuiz);
-   updateUI();
-   
-   // 모달을 부드럽게 닫기
-   const modal = document.getElementById('quizModal');
-   modal.style.transition = 'all 0.5s ease-out';
-   modal.style.opacity = '0';
-   modal.style.transform = 'scale(0.9)';
-   
-   setTimeout(() => {
-       closeModal();
-       modal.style.transition = '';
-       modal.style.opacity = '';
-       modal.style.transform = '';
-       
-       // 바로 엔딩 시퀀스 시작
-       setTimeout(() => {
-           startEndingSequence();
-       }, 300);
-   }, 500);
+    completedQuizzes.push(currentQuiz);
+    localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
+    markQuizCompleted(currentQuiz);
+    updateUI();
+
+    const modal = document.getElementById('quizModal');
+    modal.style.transition = 'all 0.5s ease-out';
+    modal.style.opacity = '0';
+    modal.style.transform = 'scale(0.9)';
+
+    setTimeout(() => {
+        closeModal();
+        modal.style.transition = '';
+        modal.style.opacity = '1';
+        modal.style.transform = 'scale(1)';
+        setTimeout(startEndingSequence, 300);
+    }, 500);
 }
 
-// 엔딩 시퀀스 시작 (최종 메시지 제거 + 배경음악 추가)
+// 엔딩 시퀀스 시작
 function startEndingSequence() {
-   stopRoomTimer(); // 타이머 중지
-   
-   // 1. 화면 어두워지기
-   const fadeOverlay = document.createElement('div');
-   fadeOverlay.id = 'fadeOverlay';
-   fadeOverlay.style.cssText = `
-       position: fixed;
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100%;
-       background: black;
-       z-index: 8000;
-       opacity: 0;
-       transition: opacity 2s ease-in-out;
-   `;
-   document.body.appendChild(fadeOverlay);
-   
-   // 페이드 인 시작
-   setTimeout(() => {
-       fadeOverlay.style.opacity = '1';
-   }, 100);
-   
-   // 2. 어두워진 후 엔딩 화면 준비
-   setTimeout(() => {
-       // 게임 화면 숨기기
-       document.getElementById('gameScreen').style.display = 'none';
-       
-       // 엔딩 화면 준비 (줌인 상태로 시작)
-       const endingScreen = document.getElementById('endingScreen');
-       endingScreen.style.display = 'flex';
-       endingScreen.style.opacity = '1';
-       endingScreen.style.transform = 'scale(1.5)'; // 줌인 상태
-       endingScreen.classList.add('active');
+    stopRoomTimer();
 
-       // 배경음악 시작
-       playBackgroundMusic();
-       
-       // 3. 페이드 아웃하면서 엔딩 이미지 보이기
-       setTimeout(() => {
-           fadeOverlay.style.opacity = '0';
-           
-           // 4. 동시에 줌아웃 효과
-           endingScreen.style.transition = 'transform 3s ease-out';
-           endingScreen.style.transform = 'scale(1)'; // 줌아웃
-           
-           // 5. 페이드 오버레이 제거 및 배경음악 시작
-           setTimeout(() => {
-               if (fadeOverlay.parentNode) {
-                   fadeOverlay.parentNode.removeChild(fadeOverlay);
-               }
-               
-               // 축하 효과만 추가 (메시지 없이)
-               createCelebrationEffect();
-               
-               localStorage.setItem('gameCompleted', 'true');
-           }, 2000);
-       }, 500);
-   }, 2000);
+    const fadeOverlay = document.createElement('div');
+    fadeOverlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 8000; opacity: 0; transition: opacity 2s ease-in-out;`;
+    document.body.appendChild(fadeOverlay);
+    
+    setTimeout(() => { fadeOverlay.style.opacity = '1'; }, 100);
+
+    setTimeout(() => {
+        document.getElementById('gameScreen').style.display = 'none';
+        const endingScreen = document.getElementById('endingScreen');
+        endingScreen.style.display = 'flex';
+        endingScreen.classList.add('active');
+        playBackgroundMusic();
+
+        setTimeout(() => {
+            fadeOverlay.style.opacity = '0';
+            setTimeout(() => {
+                fadeOverlay.remove();
+                createCelebrationEffect();
+                localStorage.setItem('gameCompleted', 'true');
+            }, 2000);
+        }, 500);
+    }, 2000);
 }
 
 // 답안 정규화
 function normalizeAnswer(answer) {
-   return answer.toLowerCase()
-               .replace(/\s+/g, '')
-               .replace(/[이가을를의에서]/g, '');
+    return answer.toLowerCase().replace(/\s+/g, '');
 }
 
 // 정답 처리
 function correctAnswer() {
-   if (!completedQuizzes.includes(currentQuiz)) {
+    if (!completedQuizzes.includes(currentQuiz)) {
         completedQuizzes.push(currentQuiz);
-   }
-   localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
-   
-   markQuizCompleted(currentQuiz);
-   closeModal();
-   updateUI();
-   
-   playCompletionEffect();
-   checkRoomCompletion();
+    }
+    localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
+    markQuizCompleted(currentQuiz);
+    closeModal();
+    updateUI();
+    playCompletionEffect();
+    checkRoomCompletion();
 }
 
 // 오답 처리
 function wrongAnswer() {
-   showMessage("다시 입력해 주세요");
-   
-   const quiz = quizzes[currentQuiz];
-   if (quiz.type === 'matching') {
-       // 매칭 게임은 자동으로 피드백이 제공됨
-       return;
-   } else if (quiz.type === 'four') {
-       for (let i = 1; i <= 2; i++) { // ✨ 4 -> 2
-           document.getElementById(\`answer\${i}\`).value = '';
-       }
-       document.getElementById('answer1').focus();
-   } else {
-       document.getElementById('quizAnswer').value = '';
-       document.getElementById('quizAnswer').focus();
-   }
+    showMessage("다시 입력해 주세요");
+    const inputs = document.querySelectorAll('#quizInput input, #quizInput textarea');
+    inputs.forEach(input => input.value = '');
+    if(inputs.length > 0) inputs[0].focus();
 }
 
 // 퀴즈 완료 표시
 function markQuizCompleted(quizId) {
-   const elements = document.querySelectorAll('.clickable');
-   let targetElement = null;
-   
-   if (quizId >= 1 && quizId <= 4) {
-       const room1Elements = document.querySelectorAll('#room1 .clickable');
-       targetElement = room1Elements[quizId - 1];
-   }
-   else if (quizId >= 5 && quizId <= 8) {
-       const room2Elements = document.querySelectorAll('#room2 .clickable');
-       targetElement = room2Elements[quizId - 5];
-   }
-   else if (quizId >= 9 && quizId <= 12) {
-       const room3Elements = document.querySelectorAll('#room3 .clickable');
-       targetElement = room3Elements[quizId - 9];
-   }
-   
-   if (targetElement) {
-       targetElement.classList.add('completed');
-   }
+    const roomQuizzes = {
+        1: [1,2,3,4], 2: [5,6,7,8], 3: [9,10,11,12]
+    };
+    for(const room in roomQuizzes){
+        const index = roomQuizzes[room].indexOf(quizId);
+        if(index > -1){
+            const clickable = document.querySelectorAll(`#room${room} .clickable`)[index];
+            if(clickable) clickable.classList.add('completed');
+            break;
+        }
+    }
 }
 
 // 완료 효과
 function playCompletionEffect() {
-   const elements = document.querySelectorAll('.clickable.completed');
-   const lastElement = elements[elements.length - 1];
-   if (lastElement) {
-       lastElement.style.animation = 'none';
-       setTimeout(() => {
-           lastElement.style.animation = 'glow 1s ease-in-out';
-       }, 10);
-   }
+    const lastCompleted = document.querySelectorAll('.clickable.completed');
+    const lastElement = lastCompleted[lastCompleted.length - 1];
+    if (lastElement) {
+        lastElement.style.animation = 'mysticalGlow 1s ease-in-out';
+        setTimeout(() => {
+            lastElement.style.animation = '';
+        }, 1000);
+    }
 }
 
 // 방 완료 확인
 function checkRoomCompletion() {
-   const roomQuizzes = getRoomQuizzes(currentRoom);
-   const completed = roomQuizzes.every(id => completedQuizzes.includes(id));
-   
-   if (completed) {
-       if (currentRoom < 3) {
-           document.getElementById('nextRoomBtn').style.display = 'block';
-       }
-       // 방3 완료는 마지막 퀴즈(12번)에서 직접 처리
-   } else {
-       document.getElementById('nextRoomBtn').style.display = 'none';
-   }
+    const roomQuizzes = getRoomQuizzes(currentRoom);
+    const allCompleted = roomQuizzes.every(id => completedQuizzes.includes(id));
+
+    if (allCompleted && currentRoom < 3) {
+        document.getElementById('nextRoomBtn').style.display = 'block';
+    } else {
+        document.getElementById('nextRoomBtn').style.display = 'none';
+    }
 }
 
 // 방별 퀴즈 ID 반환
 function getRoomQuizzes(roomNum) {
-   switch(roomNum) {
-       case 1: return [1, 2, 3, 4];
-       case 2: return [5, 6, 7, 8];
-       case 3: return [9, 10, 11, 12];
-       default: return [];
-   }
-}
-
-// 승리 메시지 표시 (콜백 추가)
-function showVictoryMessage(callback) {
-   // 기존 메시지 제거
-   const existingMessages = document.querySelectorAll('.victory-message');
-   existingMessages.forEach(msg => msg.remove());
-   
-   const message = document.createElement('div');
-   message.className = 'victory-message';
-   message.innerHTML = \`
-       <div class="victory-content">
-           <h3>🎉 축하합니다! 🎉</h3>
-           <p>마지막 시험을 통과하셨습니다!</p>
-       </div>
-   \`;
-   
-   // 스타일 적용
-   message.style.cssText = \`
-       position: fixed;
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100%;
-       background: rgba(0,0,0,0.9);
-       z-index: 3000;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       animation: victoryFadeIn 0.5s ease-out;
-   \`;
-   
-   const victoryContent = message.querySelector('.victory-content');
-   victoryContent.style.cssText = \`
-       background: linear-gradient(135deg, #4caf50, #2e7d32);
-       padding: 40px;
-       border-radius: 20px;
-       text-align: center;
-       color: white;
-       box-shadow: 0 0 50px rgba(76,175,80,0.8);
-       animation: victoryPulse 1s ease-in-out infinite alternate;
-   \`;
-   
-   const h3 = victoryContent.querySelector('h3');
-   h3.style.cssText = \`
-       font-size: 2.5rem;
-       margin-bottom: 20px;
-       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-   \`;
-   
-   const paragraphs = victoryContent.querySelectorAll('p');
-   paragraphs.forEach(p => {
-       p.style.cssText = \`
-           font-size: 1.3rem;
-           margin-bottom: 15px;
-           line-height: 1.4;
-       \`;
-   });
-   
-   document.body.appendChild(message);
-   
-   // 애니메이션 키프레임 추가
-   if (!document.querySelector('#victoryAnimations')) {
-       const style = document.createElement('style');
-       style.id = 'victoryAnimations';
-       style.textContent = \`
-           @keyframes victoryFadeIn {
-               from { opacity: 0; transform: scale(0.8); }
-               to { opacity: 1; transform: scale(1); }
-           }
-           @keyframes victoryPulse {
-               from { transform: scale(1); box-shadow: 0 0 50px rgba(76,175,80,0.8); }
-               to { transform: scale(1.02); box-shadow: 0 0 70px rgba(76,175,80,1); }
-           }
-       \`;
-       document.head.appendChild(style);
-   }
-   
-   // 2.5초 후 메시지 제거 및 콜백 실행
-   setTimeout(() => {
-       message.style.animation = 'victoryFadeOut 0.5s ease-out forwards';
-       setTimeout(() => {
-           if (message.parentNode) {
-               message.parentNode.removeChild(message);
-           }
-           if (callback) callback();
-       }, 500);
-   }, 2500);
-   
-   // fadeOut 애니메이션 추가
-   const existingStyle = document.querySelector('#victoryAnimations');
-   if (existingStyle) {
-       existingStyle.textContent += \`
-           @keyframes victoryFadeOut {
-               from { opacity: 1; transform: scale(1); }
-               to { opacity: 0; transform: scale(0.8); }
-           }
-       \`;
-   }
+    switch (roomNum) {
+        case 1: return [1, 2, 3, 4];
+        case 2: return [5, 6, 7, 8];
+        case 3: return [9, 10, 11, 12];
+        default: return [];
+    }
 }
 
 // 축하 효과 생성
 function createCelebrationEffect() {
-   // 색종이 효과 생성
-   for (let i = 0; i < 50; i++) {
-       createConfetti();
-   }
-   
-   // 계속 지속적으로 색종이 생성
-   confettiInterval = setInterval(() => {
-       for (let i = 0; i < 10; i++) {
-           createConfetti();
-       }
-   }, 200);
+    for (let i = 0; i < 50; i++) createConfetti();
+    if(confettiInterval) clearInterval(confettiInterval);
+    confettiInterval = setInterval(() => { for (let i = 0; i < 10; i++) createConfetti(); }, 200);
 }
 
 // 색종이 개별 생성
 function createConfetti() {
-   const confetti = document.createElement('div');
-   const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
-   const randomColor = colors[Math.floor(Math.random() * colors.length)];
-   
-   confetti.style.cssText = \`
-       position: fixed;
-       width: 10px;
-       height: 10px;
-       background: \${randomColor};
-       top: -10px;
-       left: \${Math.random() * 100}vw;
-       z-index: 9999;
-       border-radius: 2px;
-       pointer-events: none;
-       animation: confettiFall \${2 + Math.random() * 3}s linear forwards;
-   \`;
-   
-   document.body.appendChild(confetti);
-   
-   // 색종이 애니메이션 추가
-   if (!document.querySelector('#confettiAnimation')) {
-       const style = document.createElement('style');
-       style.id = 'confettiAnimation';
-       style.textContent = \`
-           @keyframes confettiFall {
-               to {
-                   transform: translateY(100vh) rotate(360deg);
-                   opacity: 0;
-               }
-           }
-       \`;
-       document.head.appendChild(style);
-   }
-   
-   // 애니메이션 완료 후 요소 제거
-   setTimeout(() => {
-       if (confetti.parentNode) {
-           confetti.parentNode.removeChild(confetti);
-       }
-   }, 5000);
+    const confetti = document.createElement('div');
+    const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+    confetti.style.cssText = `position: fixed; width: 10px; height: 10px; background: ${colors[Math.floor(Math.random() * colors.length)]}; top: -10px; left: ${Math.random() * 100}vw; z-index: 9999; border-radius: 2px; pointer-events: none; animation: confettiFall ${2 + Math.random() * 3}s linear forwards;`;
+    document.body.appendChild(confetti);
+    setTimeout(() => { if (confetti.parentNode) confetti.parentNode.removeChild(confetti); }, 5000);
 }
 
-// 다음 방으로 이동 (텍스트 없이)
+// 다음 방으로 이동
 function nextRoom() {
-   const nextRoomNum = currentRoom + 1;
-   
-   // 타이머 리셋
-   stopRoomTimer();
-   
-   const videoKey = \`room\${currentRoom}\`;
-   showTransitionWithVideo(videoKey, () => {
-       document.getElementById(\`room\${currentRoom}\`).classList.add('exit-left');
-       
-       setTimeout(() => {
-           currentRoom = nextRoomNum;
-           localStorage.setItem('currentRoom', currentRoom);
-           showRoom(currentRoom);
-           document.getElementById('nextRoomBtn').style.display = 'none';
-           updateUI();
-           startRoomTimer(); // 새 방에서 타이머 시작
-       }, 400);
-   });
+    const nextRoomNum = currentRoom + 1;
+    stopRoomTimer();
+    showTransitionWithVideo(`room${currentRoom}`, () => {
+        document.getElementById(`room${currentRoom}`).classList.remove('active');
+        currentRoom = nextRoomNum;
+        localStorage.setItem('currentRoom', currentRoom);
+        showRoom(currentRoom);
+        document.getElementById('nextRoomBtn').style.display = 'none';
+        updateUI();
+        startRoomTimer();
+    });
 }
 
 // 방 표시
 function showRoom(roomNum) {
-   for (let i = 1; i <= 3; i++) {
-       const room = document.getElementById(\`room\${i}\`);
-       room.classList.remove('active', 'exit-left'); // ✨ display:none 대신 class로 컨트롤
-   }
-   
-   const currentRoomElement = document.getElementById(\`room\${roomNum}\`);
-   currentRoomElement.classList.add('active');
+    document.querySelectorAll('.room').forEach(room => room.classList.remove('active'));
+    document.getElementById(`room${roomNum}`).classList.add('active');
 }
 
 
 // UI 업데이트
 function updateUI() {
-   const totalCompleted = completedQuizzes.length;
-   const roomNames = {
-       1: "제1의 방: 음운의 개념",
-       2: "제2의 방: 자음의 세계", 
-       3: "제3의 방: 모음의 세계"
-   };
-   
-   document.getElementById('progress').textContent = \`\${totalCompleted}/12 완료\`;
-   document.getElementById('roomInfo').textContent = roomNames[currentRoom] || \`방 \${currentRoom}\`;
+    const totalCompleted = completedQuizzes.length;
+    const roomNames = {
+        1: "제1의 방: 음운의 개념",
+        2: "제2의 방: 자음의 세계",
+        3: "제3의 방: 모음의 세계"
+    };
+    document.getElementById('progress').textContent = `${totalCompleted}/12 완료`;
+    document.getElementById('roomInfo').textContent = roomNames[currentRoom] || `방 ${currentRoom}`;
 }
 
 // 모달 닫기
 function closeModal() {
-   document.getElementById('quizModal').style.display = 'none';
-   currentQuiz = null;
+    document.getElementById('quizModal').style.display = 'none';
+    currentQuiz = null;
 }
 
 // 메시지 표시
 function showMessage(text) {
-   const message = document.createElement('div');
-   message.className = 'message';
-   message.textContent = text;
-   // ✨ 스타일시트에서 스타일을 관리하도록 CSS 클래스만 추가
-   document.body.appendChild(message);
-   
-   setTimeout(() => {
-       if (message.parentNode) {
-           message.parentNode.removeChild(message);
-       }
-   }, 1500);
+    const message = document.createElement('div');
+    message.className = 'message-toast'; // ✨ 새로운 클래스 이름
+    message.textContent = text;
+    document.body.appendChild(message);
+    setTimeout(() => { if(message.parentNode) message.parentNode.removeChild(message) }, 2000);
 }
 
-// 게임 재시작 - 부드러운 전환 추가
+
+// 게임 재시작
 function restartGame() {
-   stopRoomTimer(); // 타이머 중지
-   stopBackgroundMusic(); // 배경음악 중지
-   
-   // 색종이 인터벌 정지 추가
-   if (confettiInterval) {
-       clearInterval(confettiInterval);
-       confettiInterval = null;
-   }
-   
-   // 색종이 효과 정리
-   const confettis = document.querySelectorAll('div[style*="confettiFall"]');
-   confettis.forEach(confetti => {
-       if (confetti.parentNode) {
-           confetti.parentNode.removeChild(confetti);
-       }
-   });
-   
-   // 상태 초기화
-   currentRoom = 1;
-   completedQuizzes = [];
-   currentQuiz = null;
-   timeLeft = 600;
-   isTimerActive = false;
-   
-   localStorage.removeItem('completedQuizzes');
-   localStorage.removeItem('currentRoom');
-   localStorage.removeItem('gameCompleted');
-   
-   document.querySelectorAll('.clickable').forEach(element => {
-       element.classList.remove('completed');
-       element.style.animation = '';
-   });
-   
-   // 모든 화면 리셋
-   document.getElementById('endingScreen').classList.remove('active');
-   document.getElementById('gameScreen').classList.remove('active');
-   document.getElementById('gameOverScreen').classList.remove('active');
-   document.getElementById('gameOverScreen').style.display = 'none';
-   
-   // 부드럽게 시작 화면으로 전환
-   document.getElementById('endingScreen').style.transition = 'opacity 1s ease-out';
-   document.getElementById('endingScreen').style.opacity = '0';
-   
-   setTimeout(() => {
-       document.getElementById('endingScreen').style.display = 'none';
-       document.getElementById('endingScreen').style.transition = '';
-       document.getElementById('endingScreen').style.opacity = '';
-       document.getElementById('endingScreen').style.transform = '';
-       
-       document.getElementById('startScreen').style.display = 'flex';
-       document.getElementById('startScreen').classList.remove('fade-out');
-       document.getElementById('nextRoomBtn').style.display = 'none';
-       
-       hideTimerWarning();
-       showRoom(1);
-       updateUI();
-   }, 1000);
+    stopRoomTimer();
+    stopBackgroundMusic();
+    if (confettiInterval) clearInterval(confettiInterval);
+
+    const confettis = document.querySelectorAll('div[style*="confettiFall"]');
+    confettis.forEach(c => { if(c.parentNode) c.parentNode.removeChild(c) });
+
+    currentRoom = 1;
+    completedQuizzes = [];
+    currentQuiz = null;
+    timeLeft = 600;
+    isTimerActive = false;
+    localStorage.clear();
+
+    document.querySelectorAll('.clickable').forEach(el => el.classList.remove('completed'));
+    
+    document.getElementById('endingScreen').classList.remove('active');
+    document.getElementById('gameOverScreen').classList.remove('active');
+
+    setTimeout(() => {
+        document.getElementById('endingScreen').style.display = 'none';
+        document.getElementById('gameOverScreen').style.display = 'none';
+
+        const startScreen = document.getElementById('startScreen');
+        startScreen.style.display = 'flex';
+        startScreen.classList.remove('fade-out');
+        document.getElementById('nextRoomBtn').style.display = 'none';
+        
+        hideTimerWarning();
+        showRoom(1);
+        updateUI();
+        updateTimerDisplay(); // 타이머 표시 초기화
+    }, 500);
 }
 
-// 비디오 포함 전환 효과 - 텍스트 제거
+
+// 비디오 포함 전환 효과
 function showTransitionWithVideo(videoKey, callback) {
-   const transition = document.getElementById('screenTransition');
-   const video = document.getElementById('transitionVideo');
-   video.muted = false; // ✨ 음소거 해제
-   // 전환 효과 시작
-   transition.classList.add('active');
-   
-   // 비디오 설정
-   const videoSrc = transitionVideos[videoKey];
-   let videoLoaded = false;
-   let callbackExecuted = false;
-   
-   if (videoSrc) {
-       // 기존 이벤트 리스너 제거
-       video.removeEventListener('loadeddata', handleVideoLoad);
-       video.removeEventListener('ended', handleVideoEnd);
-       video.removeEventListener('error', handleVideoError);
-       
-       video.src = videoSrc;
-       
-       // 비디오 로드 처리
-       function handleVideoLoad() {
-           videoLoaded = true;
-           video.play().catch(e => {
-               console.log('비디오 자동재생 실패, 기본 전환으로 진행:', e);
-               executeCallback();
-           });
-       }
-       
-       // 비디오 종료 처리
-       function handleVideoEnd() {
-           executeCallback();
-       }
-       
-       // 비디오 에러 처리
-       function handleVideoError() {
-           console.log('비디오 로드 실패, 기본 전환으로 진행');
-           executeCallback();
-       }
-       
-       // 콜백 실행 함수
-       function executeCallback() {
-           if (callbackExecuted) return;
-           callbackExecuted = true;
-           
-           if (callback) callback();
-           
-           setTimeout(() => {
-               transition.classList.remove('active');
-               video.src = '';
-               video.removeEventListener('loadeddata', handleVideoLoad);
-               video.removeEventListener('ended', handleVideoEnd);
-               video.removeEventListener('error', handleVideoError);
-           }, 300);
-       }
-       
-       // 이벤트 리스너 등록
-       video.addEventListener('loadeddata', handleVideoLoad, { once: true });
-       video.addEventListener('ended', handleVideoEnd, { once: true });
-       video.addEventListener('error', handleVideoError, { once: true });
-       
-       // 비디오 로드 시작
-       video.load();
-       
-       // 비디오 로드 타임아웃 (3초)
-       setTimeout(() => {
-           if (!videoLoaded && !callbackExecuted) {
-               console.log('비디오 로드 시간 초과, 기본 전환으로 진행');
-               executeCallback();
-           }
-       }, 3000);
-       
-   } else {
-       // 비디오가 없는 경우 기본 전환 효과
-       console.log('비디오 파일 없음, 기본 전환 효과 사용');
-       setTimeout(() => {
-           if (callback) callback();
-           setTimeout(() => {
-               transition.classList.remove('active');
-           }, 500);
-       }, 1500);
-   }
-   
-   // 최대 대기 시간 (7초) 후 강제 진행
-   setTimeout(() => {
-       if (!callbackExecuted) {
-           console.log('최대 대기 시간 초과, 강제 진행');
-           if (callback) callback();
-           setTimeout(() => {
-               transition.classList.remove('active');
-               video.src = '';
-           }, 500);
-       }
-   }, 7000);
+    const transition = document.getElementById('screenTransition');
+    const video = document.getElementById('transitionVideo');
+    video.muted = false;
+    transition.classList.add('active');
+
+    const videoSrc = transitionVideos[videoKey];
+    let callbackExecuted = false;
+
+    const executeCallback = () => {
+        if (callbackExecuted) return;
+        callbackExecuted = true;
+        if (callback) callback();
+        setTimeout(() => {
+            transition.classList.remove('active');
+            video.src = '';
+        }, 300);
+    };
+
+    if (videoSrc) {
+        video.src = videoSrc;
+        const playPromise = video.play();
+        if(playPromise !== undefined){
+            playPromise.then(() => {
+                video.addEventListener('ended', executeCallback, { once: true });
+            }).catch(e => {
+                console.log('비디오 자동재생 실패, 기본 전환으로 진행:', e);
+                executeCallback();
+            });
+        }
+    } else {
+        console.log('비디오 파일 없음, 기본 전환 효과 사용');
+        setTimeout(executeCallback, 500);
+    }
 }
 
 // 키보드 이벤트 처리
-document.addEventListener('keydown', function(e) {
-   if (e.key === 'Escape') {
-       closeModal();
-   }
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // 모달 외부 클릭 시 닫기
-document.getElementById('quizModal').addEventListener('click', function(e) {
-   if (e.target === this) {
-       closeModal();
-   }
-});
+document.getElementById('quizModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
-// 페이지 로드 시 초기화 (사운드 초기화 추가 및 전체 화면 요청)
+// 페이지 로드 시 초기화
 window.addEventListener('load', function() {
-    // 사운드 초기화
     initializeSounds();
- 
+
+    const style = document.createElement('style'); // ✨ 필요한 스타일 동적 추가
+    style.textContent = `
+        .message-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 1.5rem 2.5rem;
+            border-radius: 1rem;
+            z-index: 10001;
+            font-size: 1.5rem;
+            animation: toast-fade 2s ease-in-out;
+            pointer-events: none;
+        }
+        @keyframes toast-fade {
+            0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            10%, 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes confettiFall {
+            to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .period-item.selected, .law-item.selected {
+             border-color: #ffd700 !important;
+             box-shadow: 0 0 15px rgba(255,215,0,0.6) !important;
+        }
+    `;
+    document.head.appendChild(style);
+
     const gameCompleted = localStorage.getItem('gameCompleted');
     if (gameCompleted) {
         document.getElementById('startScreen').style.display = 'none';
@@ -1960,14 +1221,12 @@ window.addEventListener('load', function() {
     } else {
         const savedRoom = localStorage.getItem('currentRoom');
         const savedQuizzes = localStorage.getItem('completedQuizzes');
-        
+
         if (savedRoom && savedQuizzes) {
-            // ✨ 저장된 게임이 있으면 '이어서 하기' 화면 표시
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('resumeScreen').style.display = 'flex';
         } else {
-            // 저장된 게임이 없으면 시작 화면 표시 (기존 로직)
             document.getElementById('startScreen').style.display = 'flex';
         }
     }
- });
+});
