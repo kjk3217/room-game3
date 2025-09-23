@@ -24,98 +24,104 @@ const transitionVideos = {
     room2: 'videos/room2_to_room3.mp4'       // 방2 → 방3
 };
 
-// 퀴즈 데이터
+// 퀴즈 데이터 ('음운의 세계' 내용으로 전면 수정)
 const quizzes = {
-    // 방 1: 품사의 기본 개념
+    // === 방 1: 음운의 개념 ===
     1: {
-        title: "품사의 기본 개념",
-        question: "단어를 공통된 성질에 따라 갈래를 나누어 놓은 것을 무엇이라고 할까요?",
-        answers: ["품사"],
+        title: "음운의 개념",
+        question: "말의 뜻을 구별해 주는 가장 작은 소리의 단위를 무엇이라고 할까요?",
+        answers: ["음운"],
         type: "single"
     },
     2: {
-        title: "품사의 종류",
-        question: "문장에서 쓰일 때 형태가 변하는 단어(가변어)에 속하는 품사 두 가지는 동사와 무엇일까요?",
-        answers: ["형용사"],
-        type: "single"
+        title: "음운의 종류",
+        question: "음운은 크게 OOO과 OOO으로 나눌 수 있습니다. 빈칸에 들어갈 말은 무엇일까요? (순서대로 입력)",
+        answers: ["자음", "모음"],
+        type: "four" // 실제로는 2개 입력이지만, four 타입으로 2개만 받도록 설정
     },
     3: {
-        title: "품사의 분류 기준",
-        question: "단어를 분류하는 세 가지 기준은 '형태', '의미' 그리고 무엇일까요?",
-        answers: ["기능"],
+        title: "최소 대립쌍",
+        question: "오직 하나의 소리 때문에 뜻이 구별되는 단어의 쌍을 '최소 대립쌍'이라고 합니다. '물'과 '불'에서 뜻을 구별하는 음운은 무엇일까요?",
+        answers: ["ㅁ", "ㅂ"],
         type: "single"
     },
     4: {
-        title: "품사 분류하기 (첫 번째 방 탈출)",
-        question: "주어진 단어들을 '형태가 변하는 말'과 '형태가 변하지 않는 말'로 올바르게 분류하여 방을 탈출하세요.",
+        title: "첫 번째 방 탈출",
+        question: "주어진 단어들을 '자음'이 바뀌어 뜻이 달라진 단어와 '모음'이 바뀌어 뜻이 달라진 단어로 분류하여 방을 탈출하세요. (기준 단어: '달')",
         type: "word_classification",
-        words: ['먹다', '예쁘다', '날다', '슬프다', '공부하다', '하늘', '나무', '아주', '와', '책'],
-        categories: ['형태가 변함', '형태가 변하지 않음'],
+        words: ['돌', '들', '말', '솔', '딸'],
+        categories: ['자음이 바뀜', '모음이 바뀜'],
         correctClassification: {
-            '형태가 변함': ['먹다', '예쁘다', '날다', '슬프다', '공부하다'],
-            '형태가 변하지 않음': ['하늘', '나무', '아주', '와', '책']
+            '자음이 바뀜': ['말', '솔', '딸'],
+            '모음이 바낌': ['돌', '들']
         }
     },
-    // 방 2: 체언과 용언
+    // === 방 2: 자음의 세계 ===
     5: {
-        title: "체언의 종류",
-        question: "다음 빈칸에 들어갈 알맞은 단어를 순서대로 채우세요.\n\n1. 사람이나 사물의 이름을 나타내는 품사는? (예: 하늘, 사랑)\n2. 이름을 대신하여 가리키는 품사는? (예: 나, 우리, 여기)\n3. 수량이나 순서를 나타내는 품사는? (예: 하나, 첫째)\n4. 위 세 품사를 묶어 OOO이라고 합니다.",
-        answers: ["명사", "대명사", "수사", "체언"],
-        type: "four"
+        title: "좋은 울림, 좋은 위치",
+        question: "다음 자음들을 소리 나는 위치에 따라 알맞게 짝지어 보세요.",
+        type: "matching",
+        periods: ["ㅁ, ㅂ, ㅍ", "ㄴ, ㄷ, ㄹ, ㅅ", "ㄱ, ㅋ, ㅇ", "ㅈ, ㅊ"],
+        laws: ["입술소리", "잇몸소리", "여린입천장소리", "센입천장소리"],
+        correctMatches: {
+            "ㅁ, ㅂ, ㅍ": "입술소리",
+            "ㄴ, ㄷ, ㄹ, ㅅ": "잇몸소리",
+            "ㄱ, ㅋ, ㅇ": "여린입천장소리",
+            "ㅈ, ㅊ": "센입천장소리"
+        }
     },
     6: {
-        title: "용언의 종류 (1)",
-        question: "사람이나 사물의 움직임을 나타내는 품사는 무엇일까요? (예: 먹다, 달리다)",
-        answers: ["동사"],
+        title: "콧소리와 흐름소리",
+        question: "발음할 때 코를 통해 공기가 나오는 '콧소리(비음)'에 해당하는 자음 세 가지는 'ㄴ, ㅁ' 그리고 무엇일까요?",
+        answers: ["ㅇ"],
         type: "single"
     },
     7: {
-        title: "품사 배열하기",
-        question: "예시 문장: '나는 새 신발을 샀다.'\n\n아래 품사들을 위 문장의 순서에 맞게 올바르게 배열하세요.",
-        shuffledWords: ["대명사", "조사", "관형사", "명사", "조사", "동사"].sort(() => Math.random() - 0.5),
-        correctOrder: ["대명사", "조사", "관형사", "명사", "조사", "동사"],
+        title: "소리의 세기",
+        question: "다음 자음들을 소리의 세기에 따라 '예사소리-된소리-거센소리' 순서로 올바르게 배열하세요.",
+        shuffledWords: ["ㄱ", "ㅋ", "ㄲ"].sort(() => Math.random() - 0.5),
+        correctOrder: ["ㄱ", "ㄲ", "ㅋ"],
         type: "word_sort"
     },
     8: {
         title: "두 번째 방 탈출",
-        question: "두 번째 방을 탈출하기 위한 <span class='highlight-red'>비밀번호</span>. (힌트: 동사와 형용사를 묶어 이르는 말)",
-        answers: ["119"],
+        question: "두 번째 방을 탈출하기 위한 비밀번호. (힌트: 입안이나 코안을 울려서 내는 소리로, 모든 모음과 자음 'ㄴ, ㄹ, ㅁ, ㅇ'이 여기에 속합니다.)",
+        answers: ["울림소리"],
         type: "password"
     },
-    // 방 3: 수식언, 관계언, 독립언
+    // === 방 3: 모음의 세계 ===
     9: {
-        title: "수식언의 종류 (1)",
-        question: "문장에서 주로 체언(명사, 대명사, 수사)을 꾸며 주는 역할을 하는 품사는 무엇일까요? (예: 새, 헌, 이, 그, 저)",
-        answers: ["관형사"],
+        title: "단모음 vs 이중 모음",
+        question: "발음할 때 입술 모양이나 혀의 위치가 변하지 않는 모음을 무엇이라고 할까요?",
+        answers: ["단모음"],
         type: "single"
     },
     10: {
-        title: "품사 짝짓기",
-        question: "각 품사와 그에 대한 설명을 올바르게 연결하세요.",
-        periods: ["명사", "동사", "부사", "조사", "감탄사"],
-        laws: ["대상의 이름을 나타냄", "대상의 움직임을 나타냄", "주로 용언을 꾸며 줌", "다른 말과의 문법적 관계를 나타냄", "놀람, 느낌, 부름, 대답을 나타냄"],
-        correctMatches: {
-            "명사": "대상의 이름을 나타냄",
-            "동사": "대상의 움직임을 나타냄",
-            "부사": "주로 용언을 꾸며 줌",
-            "조사": "다른 말과의 문법적 관계를 나타냄",
-            "감탄사": "놀람, 느낌, 부름, 대답을 나타냄"
-        },
-        type: "matching"
+        title: "단모음 체계",
+        question: "다음 단모음들을 혀의 높이에 따라 '고모음', '중모음', '저모음'으로 바르게 분류하세요.",
+        type: "word_classification",
+        words: ['ㅏ', 'ㅐ', 'ㅔ', 'ㅗ', 'ㅜ', 'ㅣ', 'ㅡ', 'ㅓ'],
+        categories: ['고모음', '중모음', '저모음'],
+        correctClassification: {
+            '고모음': ['ㅣ', 'ㅜ', 'ㅡ'],
+            '중모음': ['ㅔ', 'ㅗ', 'ㅓ'],
+            '저모음': ['ㅐ', 'ㅏ']
+        }
     },
     11: {
-        title: "관계언",
-        question: "문장에서 다른 단어와의 문법적 관계를 나타내거나 특별한 뜻을 더해주는 품사는 무엇일까요? (예: 이/가, 을/를, 은/는, 도)",
-        answers: ["조사"],
+        title: "입술은 평평하게, 혀는 앞으로",
+        question: "입술을 둥글게 오므리지 않고(평순 모음), 혀의 최고점이 앞쪽에 위치하는(전설 모음) 모음이 아닌 것은 무엇일까요? (힌트: ㅣ, ㅔ, ㅐ, ㅟ, ㅚ 중 하나)",
+        answers: ["ㅟ", "ㅚ"],
         type: "single"
     },
     12: {
         title: "마지막 방 탈출",
-        question: "마지막 방을 탈출하기 위한 <span class='highlight-red'>암호</span>.",
-        answers: ["품사"],
+        question: "마지막 방을 탈출하기 위한 암호. (힌트: '퐁당퐁당'과 '풍덩풍덩'처럼 모음을 바꾸어 어감의 차이를 나타내는 문법 현상)",
+        answers: ["모음조화"],
         type: "password"
     }
 };
+
 
 // === ✨ 전체 화면 실행을 위한 함수 추가 ✨ ===
 function requestFullScreen() {
@@ -291,7 +297,7 @@ function initTimer() {
 function startRoomTimer() {
     if (isTimerActive) return;
     
-    timeLeft = 420; // 7분 리셋
+    timeLeft = 600; // 10분 리셋
     isTimerActive = true;
     updateTimerDisplay();
     initTimer();
@@ -664,6 +670,10 @@ function createWordClassificationGame() {
     // 2. 분류 영역 (드롭존)
     const dropZonesContainer = document.createElement('div');
     dropZonesContainer.className = 'drop-zones-container';
+    dropZonesContainer.style.display = 'flex';
+    dropZonesContainer.style.gap = '20px';
+    dropZonesContainer.style.marginTop = '20px';
+
 
     quiz.categories.forEach(category => {
         const dropZone = document.createElement('div');
@@ -672,6 +682,9 @@ function createWordClassificationGame() {
 
         const title = document.createElement('h3');
         title.textContent = category;
+        title.style.textAlign = 'center';
+        title.style.color = '#87ceeb';
+        title.style.marginBottom = '10px';
         dropZone.appendChild(title);
         
         dropZonesContainer.appendChild(dropZone);
@@ -682,7 +695,7 @@ function createWordClassificationGame() {
     gameContainer.appendChild(dropZonesContainer);
     inputContainer.appendChild(gameContainer);
 
-    // 드롭 영역 설정 (unclassified 포함 3개)
+    // 드롭 영역 설정 (unclassified 포함)
     setupDropZones(unclassifiedContainer, ...dropZonesContainer.querySelectorAll('.category-drop-zone'));
 }
 
@@ -708,8 +721,10 @@ function checkWordClassificationCompletion() {
         if (wordsInZone.length !== correctWordsForCategory.length) {
             allCorrect = false;
         } else {
-            for (const word of wordsInZone) {
-                if (!correctWordsForCategory.includes(word)) {
+            const sortedWordsInZone = [...wordsInZone].sort();
+            const sortedCorrectWords = [...correctWordsForCategory].sort();
+            for (let i = 0; i < sortedWordsInZone.length; i++) {
+                if (sortedWordsInZone[i] !== sortedCorrectWords[i]) {
                     allCorrect = false;
                     break;
                 }
@@ -883,37 +898,10 @@ function createWordSortGame() {
     // 뒤섞인 단어들 컨테이너
     const shuffledContainer = document.createElement('div');
     shuffledContainer.className = 'shuffled-words-container';
-    shuffledContainer.style.cssText = `
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        padding: 20px;
-        background: rgba(0,0,0,0.3);
-        border-radius: 15px;
-        margin-bottom: 30px;
-        border: 2px solid #6a1b9a;
-        min-height: 100px;
-        justify-content: center;
-        align-items: flex-start;
-        width: 100%;
-    `;
     
     // 정답 영역 컨테이너
     const answerContainer = document.createElement('div');
     answerContainer.className = 'answer-words-container';
-    answerContainer.style.cssText = `
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        padding: 30px;
-        background: rgba(0,100,0,0.2);
-        border-radius: 15px;
-        border: 2px dashed #4caf50;
-        min-height: 120px;
-        align-items: flex-start;
-        justify-content: center;
-        width: 100%
-   `;
    
    
    // 단어 요소들 생성 (섞인 순서로)
@@ -947,20 +935,6 @@ function createWordElement(word, index) {
    wordElement.dataset.index = index;
    wordElement.textContent = word;
    wordElement.draggable = true;
-   
-   wordElement.style.cssText = `
-       background: linear-gradient(135deg, #4a90e2, #357abd);
-       color: white;
-       padding: 10px 20px;
-       border-radius: 8px;
-       cursor: grab;
-       user-select: none;
-       font-weight: bold;
-       font-size: 1.5rem;
-       border: 2px solid transparent;
-       transition: all 0.3s ease;
-       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-   `;
    
    // 드래그 이벤트 리스너
    wordElement.addEventListener('dragstart', handleDragStart);
@@ -1172,7 +1146,7 @@ function selectPeriod(periodElement) {
 // 법 선택 및 매칭
 function selectLaw(lawElement) {
    if (!window.selectedPeriod) {
-       showMessage("먼저 품사를 선택해주세요!");
+       showMessage("먼저 왼쪽 항목을 선택해주세요!");
        return;
    }
    
@@ -1218,7 +1192,7 @@ function selectLaw(lawElement) {
    window.selectedPeriod = null;
    
    // 모든 매칭 완료 확인
-   if (Object.keys(window.currentMatches).length === 5) {
+   if (Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
        setTimeout(() => {
            checkMatchingComplete();
        }, 500);
@@ -1250,13 +1224,13 @@ function createConnectionLine(periodElement, lawElement) {
    if (!document.querySelector('#checkmarkAnimation')) {
        const style = document.createElement('style');
        style.id = 'checkmarkAnimation';
-       style.textContent = `
+       style.textContent = \`
            @keyframes checkmarkPop {
                0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
                50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
            }
-       `;
+       \`;
        document.head.appendChild(style);
    }
 }
@@ -1272,7 +1246,7 @@ function checkMatchingComplete() {
        }
    }
    
-   if (allCorrect && Object.keys(window.currentMatches).length === 5) {
+   if (allCorrect && Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
        correctAnswer();
    }
 }
@@ -1295,11 +1269,11 @@ function createQuizInput(type) {
    } else if (type === 'four') {
        const container = document.createElement('div');
        container.className = 'four-inputs';
-       for (let i = 1; i <= 4; i++) {
+       for (let i = 1; i <= 2; i++) { // 2개 입력 필드만 생성
            const input = document.createElement('input');
            input.type = 'text';
-           input.id = `answer${i}`;
-           input.placeholder = `${i}번 정답`;
+           input.id = \`answer\${i}\`;
+           input.placeholder = \`\${i}번 정답\`;
            input.addEventListener('keypress', function(e) {
                if (e.key === 'Enter') checkAnswer();
            });
@@ -1351,15 +1325,15 @@ function checkAnswer() {
        return;
    } else if (quiz.type === 'four') {
        const answers = [];
-       for (let i = 1; i <= 4; i++) {
-           const value = document.getElementById(`answer${i}`).value.trim();
+       for (let i = 1; i <= 2; i++) { // 2개만 확인
+           const value = document.getElementById(\`answer\${i}\`).value.trim();
            answers.push(value);
        }
        
        const correctAnswers = quiz.answers;
        let isCorrect = true;
        
-       for (let i = 0; i < 4; i++) {
+       for (let i = 0; i < 2; i++) {
            if (normalizeAnswer(answers[i]) !== normalizeAnswer(correctAnswers[i])) {
                isCorrect = false;
                break;
@@ -1515,8 +1489,8 @@ function wrongAnswer() {
        // 매칭 게임은 자동으로 피드백이 제공됨
        return;
    } else if (quiz.type === 'four') {
-       for (let i = 1; i <= 4; i++) {
-           document.getElementById(`answer${i}`).value = '';
+       for (let i = 1; i <= 2; i++) {
+           document.getElementById(\`answer\${i}\`).value = '';
        }
        document.getElementById('answer1').focus();
    } else {
@@ -1593,15 +1567,15 @@ function showVictoryMessage(callback) {
    
    const message = document.createElement('div');
    message.className = 'victory-message';
-   message.innerHTML = `
+   message.innerHTML = \`
        <div class="victory-content">
            <h3>🎉 축하합니다! 🎉</h3>
            <p>마지막 시험을 통과하셨습니다!</p>
        </div>
-   `;
+   \`;
    
    // 스타일 적용
-   message.style.cssText = `
+   message.style.cssText = \`
        position: fixed;
        top: 0;
        left: 0;
@@ -1613,10 +1587,10 @@ function showVictoryMessage(callback) {
        justify-content: center;
        align-items: center;
        animation: victoryFadeIn 0.5s ease-out;
-   `;
+   \`;
    
    const victoryContent = message.querySelector('.victory-content');
-   victoryContent.style.cssText = `
+   victoryContent.style.cssText = \`
        background: linear-gradient(135deg, #4caf50, #2e7d32);
        padding: 40px;
        border-radius: 20px;
@@ -1624,22 +1598,22 @@ function showVictoryMessage(callback) {
        color: white;
        box-shadow: 0 0 50px rgba(76,175,80,0.8);
        animation: victoryPulse 1s ease-in-out infinite alternate;
-   `;
+   \`;
    
    const h3 = victoryContent.querySelector('h3');
-   h3.style.cssText = `
+   h3.style.cssText = \`
        font-size: 2.5rem;
        margin-bottom: 20px;
        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-   `;
+   \`;
    
    const paragraphs = victoryContent.querySelectorAll('p');
    paragraphs.forEach(p => {
-       p.style.cssText = `
+       p.style.cssText = \`
            font-size: 1.3rem;
            margin-bottom: 15px;
            line-height: 1.4;
-       `;
+       \`;
    });
    
    document.body.appendChild(message);
@@ -1648,7 +1622,7 @@ function showVictoryMessage(callback) {
    if (!document.querySelector('#victoryAnimations')) {
        const style = document.createElement('style');
        style.id = 'victoryAnimations';
-       style.textContent = `
+       style.textContent = \`
            @keyframes victoryFadeIn {
                from { opacity: 0; transform: scale(0.8); }
                to { opacity: 1; transform: scale(1); }
@@ -1657,7 +1631,7 @@ function showVictoryMessage(callback) {
                from { transform: scale(1); box-shadow: 0 0 50px rgba(76,175,80,0.8); }
                to { transform: scale(1.02); box-shadow: 0 0 70px rgba(76,175,80,1); }
            }
-       `;
+       \`;
        document.head.appendChild(style);
    }
    
@@ -1675,12 +1649,12 @@ function showVictoryMessage(callback) {
    // fadeOut 애니메이션 추가
    const existingStyle = document.querySelector('#victoryAnimations');
    if (existingStyle) {
-       existingStyle.textContent += `
+       existingStyle.textContent += \`
            @keyframes victoryFadeOut {
                from { opacity: 1; transform: scale(1); }
                to { opacity: 0; transform: scale(0.8); }
            }
-       `;
+       \`;
    }
 }
 
@@ -1705,18 +1679,18 @@ function createConfetti() {
    const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
    const randomColor = colors[Math.floor(Math.random() * colors.length)];
    
-   confetti.style.cssText = `
+   confetti.style.cssText = \`
        position: fixed;
        width: 10px;
        height: 10px;
-       background: ${randomColor};
+       background: \${randomColor};
        top: -10px;
-       left: ${Math.random() * 100}vw;
+       left: \${Math.random() * 100}vw;
        z-index: 9999;
        border-radius: 2px;
        pointer-events: none;
-       animation: confettiFall ${2 + Math.random() * 3}s linear forwards;
-   `;
+       animation: confettiFall \${2 + Math.random() * 3}s linear forwards;
+   \`;
    
    document.body.appendChild(confetti);
    
@@ -1724,14 +1698,14 @@ function createConfetti() {
    if (!document.querySelector('#confettiAnimation')) {
        const style = document.createElement('style');
        style.id = 'confettiAnimation';
-       style.textContent = `
+       style.textContent = \`
            @keyframes confettiFall {
                to {
                    transform: translateY(100vh) rotate(360deg);
                    opacity: 0;
                }
            }
-       `;
+       \`;
        document.head.appendChild(style);
    }
    
@@ -1750,9 +1724,9 @@ function nextRoom() {
    // 타이머 리셋
    stopRoomTimer();
    
-   const videoKey = `room${currentRoom}`;
+   const videoKey = \`room\${currentRoom}\`;
    showTransitionWithVideo(videoKey, () => {
-       document.getElementById(`room${currentRoom}`).classList.add('exit-left');
+       document.getElementById(\`room\${currentRoom}\`).classList.add('exit-left');
        
        setTimeout(() => {
            currentRoom = nextRoomNum;
@@ -1768,12 +1742,12 @@ function nextRoom() {
 // 방 표시
 function showRoom(roomNum) {
    for (let i = 1; i <= 3; i++) {
-       const room = document.getElementById(`room${i}`);
+       const room = document.getElementById(\`room\${i}\`);
        room.style.display = 'none';
        room.classList.remove('active', 'exit-left');
    }
    
-   const currentRoomElement = document.getElementById(`room${roomNum}`);
+   const currentRoomElement = document.getElementById(\`room\${roomNum}\`);
    currentRoomElement.style.display = 'block';
    
    setTimeout(() => {
@@ -1785,13 +1759,13 @@ function showRoom(roomNum) {
 function updateUI() {
    const totalCompleted = completedQuizzes.length;
    const roomNames = {
-       1: "ROOM 1",
-       2: "ROOM 2", 
-       3: "ROOM 3"
+       1: "제1의 방: 음운의 개념",
+       2: "제2의 방: 자음의 세계", 
+       3: "제3의 방: 모음의 세계"
    };
    
-   document.getElementById('progress').textContent = `${totalCompleted}/12 완료`;
-   document.getElementById('roomInfo').textContent = roomNames[currentRoom] || `방 ${currentRoom}`;
+   document.getElementById('progress').textContent = \`\${totalCompleted}/12 완료\`;
+   document.getElementById('roomInfo').textContent = roomNames[currentRoom] || \`방 \${currentRoom}\`;
 }
 
 // 모달 닫기
@@ -1805,6 +1779,31 @@ function showMessage(text) {
    const message = document.createElement('div');
    message.className = 'message';
    message.textContent = text;
+   message.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 0, 0, 0.8);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 10px;
+        z-index: 10001;
+        font-size: 1.5rem;
+        animation: fadeInOut 1.5s ease-in-out;
+   `;
+    if (!document.querySelector('#messageAnimation')) {
+       const style = document.createElement('style');
+       style.id = 'messageAnimation';
+       style.textContent = \`
+           @keyframes fadeInOut {
+               0%, 100% { opacity: 0; }
+               20%, 80% { opacity: 1; }
+           }
+       \`;
+       document.head.appendChild(style);
+   }
+
    document.body.appendChild(message);
    
    setTimeout(() => {
