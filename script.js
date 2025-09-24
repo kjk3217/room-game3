@@ -1218,7 +1218,7 @@ function selectLaw(lawElement) {
    window.selectedPeriod = null;
    
    // 모든 매칭 완료 확인
-   if (Object.keys(window.currentMatches).length === quizzes[currentQuiz].periods.length) {
+   if (Object.keys(window.currentMatches).length === 4) {
        setTimeout(() => {
            checkMatchingComplete();
        }, 500);
@@ -2013,5 +2013,6 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
