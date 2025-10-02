@@ -72,9 +72,9 @@ const quizzes = {
     },
     7: {
         title: "소리의 세기",
-        question: "다음 자음들을 소리의 세기에 따라 '예사소리-된소리-거센소리' 순서로 올바르게 배열하세요.",
-        shuffledWords: ["ㄱ", "ㅋ", "ㄲ"].sort(() => Math.random() - 0.5),
-        correctOrder: ["ㄱ", "ㄲ", "ㅋ"],
+        question: "다음 자음들을 소리의 세기에 따라 'ㄱ-ㄲ-ㅋ' 순서로 올바르게 배열하세요.",
+        shuffledWords: ["예사소리", "된소리", "거센소리"].sort(() => Math.random() - 0.5),
+        correctOrder: ["예사소리", "된소리", "거센소리"],
         type: "word_sort"
     },
     8: {
@@ -2014,6 +2014,7 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
 
