@@ -112,7 +112,7 @@ const quizzes = {
     12: {
         title: "마지막 방 탈출",
         question: "마지막 방을 탈출하기 위한 <span class='highlight-red'>암호</span>.",
-        answers: ["모음자음"],
+        answers: ["음운"],
         type: "password"
     }
 };
@@ -2015,3 +2015,4 @@ window.addEventListener('load', function() {
         }
     }
  });
+
