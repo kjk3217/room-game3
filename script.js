@@ -1273,7 +1273,8 @@ function checkMatchingComplete() {
        }
    }
    
-   if (allCorrect && Object.keys(window.currentMatches).length === 5) {
+   // 🚨 BUG FIX: 5가 아닌 퀴즈에 정의된 짝의 수와 비교합니다.
+   if (allCorrect && Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
        correctAnswer();
    }
 }
@@ -2014,9 +2015,3 @@ window.addEventListener('load', function() {
         }
     }
  });
-
-
-
-
-
-
