@@ -35,7 +35,7 @@ const quizzes = {
     },
     2: {
         title: "음운의 종류",
-        question: "음운은 크게 OOO과 OOO으로 나눌 수 있습니다. 빈칸에 들어갈 말은 무엇일까요? (두 단어 입력)",
+        question: "음운은 크게 OO과 OO으로 나눌 수 있습니다. 빈칸에 들어갈 말은 무엇일까요? (두 단어 입력)",
         answers: ["자음 모음", "모음 자음", "모음자음", "자음모음"],
         type: "single"
     },
@@ -2015,5 +2015,6 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
