@@ -80,7 +80,7 @@ const quizzes = {
     8: {
         title: "두 번째 방 탈출",
         question: "두 번째 방을 탈출하기 위한 <span class='highlight-red'>비밀번호</span>. (힌트: 울림소리)",
-        answers: ["119"],
+        answers: ["130"],
         type: "password"
     },
     // 방 3: 수식언, 관계언, 독립언
@@ -2015,4 +2015,5 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
