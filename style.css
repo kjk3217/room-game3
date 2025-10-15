@@ -257,7 +257,6 @@ body {
 /* 마우스 올렸을 때 애니메이션 제거 -> 충돌 방지 */
 .clickable:hover {
     transform: scale(1.05);
-    border-color: rgba(255, 255, 0, 0.5); /* ✨ 호버 시 테두리 표시 */
 }
 /* ======================================= */
 
@@ -565,3 +564,4 @@ body {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
+
