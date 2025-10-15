@@ -253,15 +253,14 @@ body {
     background: rgba(255, 255, 0, 0); /* 투명 배경 */
 }
 
-@keyframes mysticalGlow {
-    50% { filter: drop-shadow(0 0 15px rgba(255, 255, 224, 0.7)) drop-shadow(0 0 25px rgba(255, 215, 0, 0.5)); }
-}
-
+/* === ✨ 반짝이는 효과 수정 ✨ === */
+/* 마우스 올렸을 때 애니메이션 제거 -> 충돌 방지 */
 .clickable:hover {
-    animation: mysticalGlow 2s ease-in-out infinite;
     transform: scale(1.05);
     border-color: rgba(255, 255, 0, 0.5); /* ✨ 호버 시 테두리 표시 */
 }
+/* ======================================= */
+
 
 .clickable.completed {
     border-color: transparent;
@@ -303,19 +302,18 @@ body {
     border-color: transparent;
 }
 
+/* === ✨ 반짝이는 효과 수정 ✨ === */
 .clickable.next-quiz {
     animation: nextQuizGlow 1.5s ease-in-out infinite;
-    box-shadow: none;
 }
 
-/* === ✨ 반짝이는 효과 수정 ✨ === */
 @keyframes nextQuizGlow {
     0%, 100% {
-        filter: drop-shadow(0 0 15px #ffd700); /* 밝은 노란색 그림자 효과 */
+        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.7);
         transform: scale(1);
     }
     50% {
-        filter: drop-shadow(0 0 25px #ffd700); /* 반짝이는 느낌 강화 */
+        box-shadow: 0 0 25px 10px rgba(255, 215, 0, 1);
         transform: scale(1.03);
     }
 }
