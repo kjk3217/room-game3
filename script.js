@@ -263,21 +263,21 @@ function initTimer() {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
         function createTickSound() {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+            const oscillator = audio.createOscillator();
+            const gainNode = audio.createGain();
             
             oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            gainNode.connect(audio.destination);
             
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.setValueAtTime(800, audio.currentTime);
             oscillator.type = 'square';
             
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0, audio.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audio.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.1);
             
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.1);
+            oscillator.start(audio.currentTime);
+            oscillator.stop(audio.currentTime + 0.1);
         }
         
         tickSound = createTickSound;
@@ -399,32 +399,39 @@ function loadGameState() {
     });
     
     checkRoomCompletion();
+    updateQuizObjectsState(); // ✨ 퀴즈 상태 업데이트 함수 호출
 }
 
-// 퀴즈 열기 - 완료된 퀴즈도 열람 가능하도록 수정 + 클릭 사운드 추가
+// ✨ 퀴즈 열기 함수 수정
 function openQuiz(quizId) {
-    // 클릭 사운드 재생
     playClickSound();
-    
+
+    // 순차적 퀴즈 확인
+    const lastCompletedQuiz = completedQuizzes.length > 0 ? Math.max(...completedQuizzes) : 0;
+    const isLocked = quizId > lastCompletedQuiz + 1;
+
+    if (isLocked) {
+        showMessage("이전 퀴즈를 먼저 풀어주세요!");
+        return;
+    }
+
     currentQuiz = quizId;
     const quiz = quizzes[quizId];
     const isCompleted = completedQuizzes.includes(quizId);
     
-    // 👈 여기에 퀴즈별 모달 크기 설정 추가
     const modalContent = document.querySelector('.modal-content');
     
-    // 퀴즈 타입별로 크기 다르게 설정
     if (quiz.type === 'matching' || quiz.type === 'word_sort' || quiz.type === 'word_classification') {
-        modalContent.style.maxWidth = '1300px';  // 복잡한 퀴즈는 크게
+        modalContent.style.maxWidth = '1300px';
         modalContent.style.width = '95%';
     } else if (quiz.type === 'four') {
-        modalContent.style.maxWidth = '1000px';   // 4개 입력은 중간
+        modalContent.style.maxWidth = '1000px';
         modalContent.style.width = '95%';
     } else if (quiz.type === 'single' || quiz.type === 'password') {
-        modalContent.style.maxWidth = '1000px';   // 단일 입력은 작게
+        modalContent.style.maxWidth = '1000px';
         modalContent.style.width = '95%';
     } else {
-        modalContent.style.maxWidth = '1000px';   // 기본 크기
+        modalContent.style.maxWidth = '1000px';
         modalContent.style.width = '95%';
     }
     
@@ -432,7 +439,6 @@ function openQuiz(quizId) {
     document.getElementById('quizTitle').textContent = quiz.title;
     document.getElementById('quizQuestion').innerHTML = quiz.question;
     
-    // 완료된 퀴즈인 경우 정답과 함께 표시
     if (isCompleted) {
         createCompletedQuizDisplay(quiz);
     } else {
@@ -447,11 +453,9 @@ function createCompletedQuizDisplay(quiz) {
     const inputContainer = document.getElementById('quizInput');
     inputContainer.innerHTML = '';
     
-    // 정답 표시 컨테이너 생성
     const answerContainer = document.createElement('div');
     answerContainer.className = 'completed-quiz-display';
     
-    // 정답 제목
     const answerTitle = document.createElement('h4');
     answerTitle.textContent = '✅ 정답:';
     answerTitle.style.color = '#00ff00';
@@ -459,9 +463,7 @@ function createCompletedQuizDisplay(quiz) {
     answerTitle.style.fontSize = '1.5rem';
     answerContainer.appendChild(answerTitle);
     
-    // 정답 내용 표시
     if (quiz.type === 'matching') {
-        // 매칭 퀴즈 정답 표시
         const matchingAnswerContainer = document.createElement('div');
         matchingAnswerContainer.style.cssText = `
             display: grid;
@@ -495,7 +497,6 @@ function createCompletedQuizDisplay(quiz) {
         
         answerContainer.appendChild(matchingAnswerContainer);
     } else if (quiz.type === 'word_sort') {
-        // 단어 정렬 퀴즈 정답 표시
         const correctSentence = quiz.correctOrder.join(' ');
         const answerBox = document.createElement('div');
         answerBox.className = 'completed-answer-box';
@@ -512,7 +513,6 @@ function createCompletedQuizDisplay(quiz) {
         answerBox.textContent = `"${correctSentence}"`;
         answerContainer.appendChild(answerBox);
     } else if (quiz.type === 'word_classification') {
-        // 단어 분류 퀴즈 정답 표시 추가
         const classificationContainer = document.createElement('div');
         classificationContainer.style.cssText = `
             display: flex;
@@ -559,7 +559,6 @@ function createCompletedQuizDisplay(quiz) {
         });
         answerContainer.appendChild(classificationContainer);
     } else if (quiz.type === 'four') {
-        // 4개 정답인 경우
         const answersGrid = document.createElement('div');
         answersGrid.className = 'completed-answers-grid';
         answersGrid.style.display = 'grid';
@@ -584,7 +583,6 @@ function createCompletedQuizDisplay(quiz) {
         
         answerContainer.appendChild(answersGrid);
     } else {
-        // 단일 정답인 경우
         const answerBox = document.createElement('div');
         answerBox.className = 'completed-answer-box';
         answerBox.style.background = 'rgba(0,255,0,0.1)';
@@ -601,7 +599,6 @@ function createCompletedQuizDisplay(quiz) {
         answerContainer.appendChild(answerBox);
     }
     
-    // 완료 표시
     const completedMessage = document.createElement('p');
     completedMessage.textContent = '이미 완료된 퀴즈입니다. 참고용으로 정답을 확인할 수 있습니다.';
     completedMessage.style.color = '#ffd700';
@@ -613,12 +610,11 @@ function createCompletedQuizDisplay(quiz) {
     
     inputContainer.appendChild(answerContainer);
     
-    // 버튼 영역 수정
     const submitBtn = document.querySelector('.submit-btn');
     const closeBtn = document.querySelector('.close-btn');
     
     if (submitBtn) {
-        submitBtn.style.display = 'none'; // 확인 버튼 숨기기
+        submitBtn.style.display = 'none';
     }
     
     if (closeBtn) {
@@ -635,11 +631,9 @@ function createWordClassificationGame() {
 
     const quiz = quizzes[currentQuiz];
 
-    // 게임 컨테이너 생성
     const gameContainer = document.createElement('div');
     gameContainer.className = 'word-classification-container';
 
-    // 1. 분류되지 않은 단어 영역
     const unclassifiedContainer = document.createElement('div');
     unclassifiedContainer.className = 'unclassified-words-container';
     
@@ -654,14 +648,12 @@ function createWordClassificationGame() {
     `;
     unclassifiedContainer.appendChild(instructionText);
 
-    // 단어 요소들 생성 (섞어서)
     const shuffledWords = [...quiz.words].sort(() => Math.random() - 0.5);
     shuffledWords.forEach((word, index) => {
-        const wordElement = createWordElement(word, index); // 기존 함수 재활용
+        const wordElement = createWordElement(word, index);
         unclassifiedContainer.appendChild(wordElement);
     });
 
-    // 2. 분류 영역 (드롭존)
     const dropZonesContainer = document.createElement('div');
     dropZonesContainer.className = 'drop-zones-container';
 
@@ -677,12 +669,10 @@ function createWordClassificationGame() {
         dropZonesContainer.appendChild(dropZone);
     });
 
-    // 컨테이너 조립
     gameContainer.appendChild(unclassifiedContainer);
     gameContainer.appendChild(dropZonesContainer);
     inputContainer.appendChild(gameContainer);
 
-    // 드롭 영역 설정 (unclassified 포함 3개)
     setupDropZones(unclassifiedContainer, ...dropZonesContainer.querySelectorAll('.category-drop-zone'));
 }
 
@@ -694,7 +684,6 @@ function checkWordClassificationCompletion() {
     const quiz = quizzes[currentQuiz];
     const unclassifiedContainer = document.querySelector('.unclassified-words-container');
 
-    // 아직 옮겨야 할 단어가 남아있으면 확인하지 않음 (p 태그는 제외하고 계산)
     if (unclassifiedContainer.querySelectorAll('.word-element').length > 0) {
         return;
     }
@@ -717,9 +706,7 @@ function checkWordClassificationCompletion() {
         }
     });
 
-    // 모든 단어가 올바른 위치에 놓였을 때만 실행
     if (allCorrect) {
-        // 정답 시각적 효과 (7번 문제와 동일하게)
         const wordElements = document.querySelectorAll('.category-drop-zone .word-element');
         wordElements.forEach((el, index) => {
             setTimeout(() => {
@@ -731,12 +718,10 @@ function checkWordClassificationCompletion() {
             }, index * 100);
         });
         
-        // 애니메이션이 끝난 후 정답 처리
         setTimeout(() => {
             correctAnswer();
         }, wordElements.length * 100 + 500);
     }
-    // 오답일 경우: 아무런 메시지나 효과 없이 사용자가 재배치하도록 둡니다.
 }
 // =================================================================
 
@@ -748,7 +733,6 @@ function createMatchingGame() {
     
     const quiz = quizzes[currentQuiz];
     
-    // 게임 컨테이너 생성
     const gameContainer = document.createElement('div');
     gameContainer.className = 'matching-game-container';
     gameContainer.style.cssText = `
@@ -760,7 +744,6 @@ function createMatchingGame() {
         align-items: start;
     `;
     
-    // 좌측 시대 컨테이너
     const periodsContainer = document.createElement('div');
     periodsContainer.className = 'periods-container';
     periodsContainer.style.cssText = `
@@ -769,7 +752,6 @@ function createMatchingGame() {
         gap: 15px;
     `;
     
-    // 중앙 화살표 컨테이너
     const arrowContainer = document.createElement('div');
     arrowContainer.style.cssText = `
         display: flex;
@@ -780,7 +762,6 @@ function createMatchingGame() {
         padding-top: 20px;
     `;
     
-    // 우측 법 컨테이너
     const lawsContainer = document.createElement('div');
     lawsContainer.className = 'laws-container';
     lawsContainer.style.cssText = `
@@ -789,10 +770,8 @@ function createMatchingGame() {
         gap: 15px;
     `;
     
-   // 오른쪽 선택지 순서를 섞어줍니다.
-    const shuffledLaws = [...quiz.laws].sort(() => Math.random() - 0.5);
+   const shuffledLaws = [...quiz.laws].sort(() => Math.random() - 0.5);
     
-    // 시대 요소들 생성
     quiz.periods.forEach((period, index) => {
         const periodItem = document.createElement('div');
         periodItem.className = 'period-item';
@@ -816,7 +795,6 @@ function createMatchingGame() {
         periodsContainer.appendChild(periodItem);
     });
     
-    // 법 요소들 생성 (섞인 순서로)
     shuffledLaws.forEach((law, index) => {
         const lawItem = document.createElement('div');
         lawItem.className = 'law-item';
@@ -841,14 +819,12 @@ function createMatchingGame() {
     });
     
     
-    // 컨테이너 조립
     gameContainer.appendChild(periodsContainer);
     gameContainer.appendChild(arrowContainer);
     gameContainer.appendChild(lawsContainer);
     
     inputContainer.appendChild(gameContainer);
     
-    // 전역 변수 초기화
     window.selectedPeriod = null;
     window.currentMatches = {};
     window.correctMatches = quiz.correctMatches;
@@ -861,7 +837,6 @@ function createWordSortGame() {
     
     const quiz = quizzes[currentQuiz];
     
-    // 게임 컨테이너 생성
     const gameContainer = document.createElement('div');
     gameContainer.className = 'word-sort-game-container';
     gameContainer.style.cssText = `
@@ -869,7 +844,6 @@ function createWordSortGame() {
         margin: 0 auto;
     `;
     
-    // 설명 텍스트
     const instructionText = document.createElement('p');
     instructionText.textContent = '단어를 드래그하여 올바른 순서로 배열하세요.';
     instructionText.style.cssText = `
@@ -880,7 +854,6 @@ function createWordSortGame() {
         font-style: italic;
     `;
     
-    // 뒤섞인 단어들 컨테이너
     const shuffledContainer = document.createElement('div');
     shuffledContainer.className = 'shuffled-words-container';
     shuffledContainer.style.cssText = `
@@ -898,7 +871,6 @@ function createWordSortGame() {
         width: 100%;
     `;
     
-    // 정답 영역 컨테이너
     const answerContainer = document.createElement('div');
     answerContainer.className = 'answer-words-container';
     answerContainer.style.cssText = `
@@ -916,7 +888,6 @@ function createWordSortGame() {
    `;
    
    
-   // 단어 요소들 생성 (섞인 순서로)
    const shuffledWords = [...quiz.shuffledWords].sort(() => Math.random() - 0.5);
    
    shuffledWords.forEach((word, index) => {
@@ -924,17 +895,14 @@ function createWordSortGame() {
        shuffledContainer.appendChild(wordElement);
    });
    
-   // 컨테이너 조립
    gameContainer.appendChild(instructionText);
    gameContainer.appendChild(shuffledContainer);
    gameContainer.appendChild(answerContainer);
    
    inputContainer.appendChild(gameContainer);
    
-   // 드롭 영역 설정
    setupDropZones(shuffledContainer, answerContainer);
    
-   // 전역 변수 초기화
    window.currentWordOrder = [];
    window.correctWordOrder = quiz.correctOrder;
 }
@@ -962,11 +930,9 @@ function createWordElement(word, index) {
        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
    `;
    
-   // 드래그 이벤트 리스너
    wordElement.addEventListener('dragstart', handleDragStart);
    wordElement.addEventListener('dragend', handleDragEnd);
    
-   // 모바일 터치 지원
    wordElement.addEventListener('touchstart', handleTouchStart, { passive: false });
    wordElement.addEventListener('touchmove', handleTouchMove, { passive: false });
    wordElement.addEventListener('touchend', handleTouchEnd, { passive: false });
@@ -987,7 +953,6 @@ function setupDropZones(...containers) {
 
 // 드래그 시작
 function handleDragStart(e) {
-   // 드래그하는 요소의 원래 인덱스를 데이터로 전달
    e.dataTransfer.setData('text/plain', e.target.dataset.index);
    e.target.classList.add('dragging'); // Use class for visual feedback
 }
@@ -1001,7 +966,6 @@ function handleDragEnd(e) {
 // 드래그 오버
 function handleDragOver(e) {
    e.preventDefault();
-   // 드롭 영역에 따라 다른 배경색 피드백
    if (e.currentTarget.classList.contains('answer-words-container') || e.currentTarget.classList.contains('category-drop-zone')) {
         e.currentTarget.style.background = 'rgba(0,150,0,0.3)';
    } else {
@@ -1016,12 +980,10 @@ function handleDrop(e) {
     const draggedElement = document.querySelector(`.word-element[data-index='${draggedIndex}']`);
     
     if (draggedElement && e.currentTarget !== draggedElement.parentNode) {
-        // p 태그는 옮겨지지 않도록 예외 처리
         if (draggedElement.tagName.toLowerCase() !== 'p') {
             e.currentTarget.appendChild(draggedElement);
         }
         
-        // 현재 퀴즈 타입에 따라 다른 완료 체크 함수 호출
         const quizType = quizzes[currentQuiz].type;
         if (quizType === 'word_sort') {
             checkWordSortCompletion();
@@ -1030,7 +992,6 @@ function handleDrop(e) {
         }
     }
     
-    // 배경색 복원
     resetDropZoneBackground(e.currentTarget);
 }
 
@@ -1057,17 +1018,13 @@ function handleTouchStart(e) {
     const touch = e.touches[0];
     const rect = e.target.getBoundingClientRect();
 
-    // 터치가 요소의 어디에서 시작되었는지 계산
     touchOffsetX = touch.clientX - rect.left;
     touchOffsetY = touch.clientY - rect.top;
 
-    // 드래그 중인 요소에 스타일 적용
     draggedTouchElement.classList.add('touch-dragging');
-    // 초기 위치 설정 (깜빡임 방지)
     draggedTouchElement.style.left = `${rect.left}px`;
     draggedTouchElement.style.top = `${rect.top}px`;
 
-    // 드래그 중 페이지 스크롤 방지
     document.body.style.overflow = 'hidden';
 }
 
@@ -1076,7 +1033,6 @@ function handleTouchMove(e) {
     if (!draggedTouchElement) return;
     
     const touch = e.touches[0];
-    // 터치 위치에 따라 요소 위치 업데이트
     const x = touch.clientX - touchOffsetX;
     const y = touch.clientY - touchOffsetY;
     draggedTouchElement.style.left = `${x}px`;
@@ -1089,26 +1045,22 @@ function handleTouchEnd(e) {
 
     const touch = e.changedTouches[0];
 
-    // 드롭 위치의 요소를 찾기 위해 잠시 숨김
     draggedTouchElement.style.display = 'none';
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
     draggedTouchElement.style.display = '';
 
-    // 가장 가까운 드롭 컨테이너 찾기
     const dropContainer = elementBelow?.closest('.shuffled-words-container, .answer-words-container, .category-drop-zone, .unclassified-words-container');
 
-    // 스타일 초기화
     draggedTouchElement.classList.remove('touch-dragging');
     draggedTouchElement.style.left = '';
     draggedTouchElement.style.top = '';
-    document.body.style.overflow = ''; // 페이지 스크롤 복원
+    document.body.style.overflow = '';
 
     if (dropContainer && dropContainer !== draggedTouchElement.parentNode) {
         if (draggedTouchElement.tagName.toLowerCase() !== 'p') {
             dropContainer.appendChild(draggedTouchElement);
         }
         
-        // 퀴즈 완료 여부 확인
         const quizType = quizzes[currentQuiz].type;
         if (quizType === 'word_sort') {
             checkWordSortCompletion();
@@ -1128,15 +1080,12 @@ function checkWordSortCompletion() {
    const wordsInAnswer = Array.from(answerContainer.querySelectorAll('.word-element'))
        .map(el => el.dataset.word);
    
-   // 모든 단어가 정답 영역에 있는지 확인
    if (wordsInAnswer.length === window.correctWordOrder.length) {
-       // 순서가 맞는지 확인
        const isCorrectOrder = wordsInAnswer.every((word, index) => 
            word === window.correctWordOrder[index]
        );
        
        if (isCorrectOrder) {
-           // 정답 시각적 효과
            const wordElements = answerContainer.querySelectorAll('.word-element');
            wordElements.forEach((el, index) => {
                setTimeout(() => {
@@ -1157,13 +1106,11 @@ function checkWordSortCompletion() {
 
 // 시대 선택
 function selectPeriod(periodElement) {
-   // 이전 선택 해제
    document.querySelectorAll('.period-item').forEach(item => {
        item.style.borderColor = 'transparent';
        item.style.boxShadow = 'none';
    });
    
-   // 새로운 선택
    window.selectedPeriod = periodElement.dataset.period;
    periodElement.style.borderColor = '#ffd700';
    periodElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.6)';
@@ -1178,28 +1125,22 @@ function selectLaw(lawElement) {
    
    const selectedLaw = lawElement.dataset.law;
    
-   // 매칭 처리
    window.currentMatches[window.selectedPeriod] = selectedLaw;
    
-   // 시각적 피드백
    const isCorrect = window.correctMatches[window.selectedPeriod] === selectedLaw;
    
    if (isCorrect) {
-       // 정답인 경우
        lawElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
        lawElement.style.borderColor = '#00ff00';
-       lawElement.style.pointerEvents = 'none'; // 다시 선택 불가
+       lawElement.style.pointerEvents = 'none';
        
-       // 해당 시대도 녹색으로
        const periodElement = document.querySelector(`[data-period="${window.selectedPeriod}"]`);
        periodElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
        periodElement.style.borderColor = '#00ff00';
-       periodElement.style.pointerEvents = 'none'; // 다시 선택 불가
+       periodElement.style.pointerEvents = 'none';
        
-       // 연결선 효과 (선택사항)
        createConnectionLine(periodElement, lawElement);
    } else {
-       // 오답인 경우
        lawElement.style.background = 'linear-gradient(135deg, #f44336, #c62828)';
        setTimeout(() => {
            lawElement.style.background = 'linear-gradient(135deg, #4a90e2, #357abd)';
@@ -1208,7 +1149,6 @@ function selectLaw(lawElement) {
        delete window.currentMatches[window.selectedPeriod];
    }
    
-   // 선택 상태 초기화
    document.querySelectorAll('.period-item').forEach(item => {
        if (!item.style.pointerEvents || item.style.pointerEvents === 'auto') {
             item.style.borderColor = 'transparent';
@@ -1217,7 +1157,6 @@ function selectLaw(lawElement) {
    });
    window.selectedPeriod = null;
    
-   // 모든 매칭 완료 확인
    const totalMatchesNeeded = Object.keys(window.correctMatches).length;
    if (Object.keys(window.currentMatches).length === totalMatchesNeeded) {
        setTimeout(() => {
@@ -1228,7 +1167,6 @@ function selectLaw(lawElement) {
 
 // 연결선 생성 (시각적 효과)
 function createConnectionLine(periodElement, lawElement) {
-   // 간단한 연결 표시 - 체크마크로 대체
    const checkMark = document.createElement('div');
    checkMark.textContent = '✓';
    checkMark.style.cssText = `
@@ -1247,7 +1185,6 @@ function createConnectionLine(periodElement, lawElement) {
    periodElement.style.position = 'relative';
    periodElement.appendChild(checkMark);
    
-   // 애니메이션 키프레임 추가
    if (!document.querySelector('#checkmarkAnimation')) {
        const style = document.createElement('style');
        style.id = 'checkmarkAnimation';
@@ -1273,7 +1210,6 @@ function checkMatchingComplete() {
        }
    }
    
-   // 🚨 BUG FIX: 5가 아닌 퀴즈에 정의된 짝의 수와 비교합니다.
    if (allCorrect && Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
        correctAnswer();
    }
@@ -1313,7 +1249,7 @@ function createQuizInput(type) {
        createMatchingGame();
    } else if (type === 'word_sort') {
        createWordSortGame();
-   } else if (type === 'word_classification') { // 새 퀴즈 유형 추가
+   } else if (type === 'word_classification') {
        createWordClassificationGame();
    } else if (type === 'textarea') {
        const textarea = document.createElement('textarea');
@@ -1329,7 +1265,6 @@ function createQuizInput(type) {
        setTimeout(() => textarea.focus(), 100);
    }
    
-   // 버튼 영역 원상복구
    const submitBtn = document.querySelector('.submit-btn');
    const closeBtn = document.querySelector('.close-btn');
    
@@ -1348,7 +1283,6 @@ function checkAnswer() {
    const quiz = quizzes[currentQuiz];
    let userAnswer = '';
    
-    // 드래그 앤 드롭 퀴즈는 자동 체크되므로 여기서는 처리하지 않음
    if (quiz.type === 'matching' || quiz.type === 'word_sort' || quiz.type === 'word_classification') {
        return;
    } else if (quiz.type === 'four') {
@@ -1384,7 +1318,6 @@ function checkAnswer() {
    );
    
    if (isCorrect) {
-       // 마지막 퀴즈(12번)인 경우 특별한 처리
        if (currentQuiz === 12) {
            correctAnswerForFinalQuiz();
        } else {
@@ -1397,14 +1330,12 @@ function checkAnswer() {
 
 // 마지막 퀴즈 정답 처리 - 수정됨 (축하 메시지 제거, 바로 엔딩)
 function correctAnswerForFinalQuiz() {
-   // 먼저 정답 처리
    completedQuizzes.push(currentQuiz);
    localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
    
    markQuizCompleted(currentQuiz);
    updateUI();
    
-   // 모달을 부드럽게 닫기
    const modal = document.getElementById('quizModal');
    modal.style.transition = 'all 0.5s ease-out';
    modal.style.opacity = '0';
@@ -1416,7 +1347,6 @@ function correctAnswerForFinalQuiz() {
        modal.style.opacity = '';
        modal.style.transform = '';
        
-       // 바로 엔딩 시퀀스 시작
        setTimeout(() => {
            startEndingSequence();
        }, 300);
@@ -1425,9 +1355,8 @@ function correctAnswerForFinalQuiz() {
 
 // 엔딩 시퀀스 시작 (최종 메시지 제거 + 배경음악 추가)
 function startEndingSequence() {
-   stopRoomTimer(); // 타이머 중지
+   stopRoomTimer();
    
-   // 1. 화면 어두워지기
    const fadeOverlay = document.createElement('div');
    fadeOverlay.id = 'fadeOverlay';
    fadeOverlay.style.cssText = `
@@ -1443,41 +1372,32 @@ function startEndingSequence() {
    `;
    document.body.appendChild(fadeOverlay);
    
-   // 페이드 인 시작
    setTimeout(() => {
        fadeOverlay.style.opacity = '1';
    }, 100);
    
-   // 2. 어두워진 후 엔딩 화면 준비
    setTimeout(() => {
-       // 게임 화면 숨기기
        document.getElementById('gameScreen').style.display = 'none';
        
-       // 엔딩 화면 준비 (줌인 상태로 시작)
        const endingScreen = document.getElementById('endingScreen');
        endingScreen.style.display = 'flex';
        endingScreen.style.opacity = '1';
-       endingScreen.style.transform = 'scale(1.5)'; // 줌인 상태
+       endingScreen.style.transform = 'scale(1.5)';
        endingScreen.classList.add('active');
 
-       // 배경음악 시작
        playBackgroundMusic();
        
-       // 3. 페이드 아웃하면서 엔딩 이미지 보이기
        setTimeout(() => {
            fadeOverlay.style.opacity = '0';
            
-           // 4. 동시에 줌아웃 효과
            endingScreen.style.transition = 'transform 3s ease-out';
-           endingScreen.style.transform = 'scale(1)'; // 줌아웃
+           endingScreen.style.transform = 'scale(1)';
            
-           // 5. 페이드 오버레이 제거 및 배경음악 시작
            setTimeout(() => {
                if (fadeOverlay.parentNode) {
                    fadeOverlay.parentNode.removeChild(fadeOverlay);
                }
                
-               // 축하 효과만 추가 (메시지 없이)
                createCelebrationEffect();
                
                localStorage.setItem('gameCompleted', 'true');
@@ -1506,6 +1426,7 @@ function correctAnswer() {
    
    playCompletionEffect();
    checkRoomCompletion();
+   updateQuizObjectsState(); // ✨ 퀴즈 상태 업데이트 함수 호출
 }
 
 // 오답 처리
@@ -1514,7 +1435,6 @@ function wrongAnswer() {
    
    const quiz = quizzes[currentQuiz];
    if (quiz.type === 'matching') {
-       // 매칭 게임은 자동으로 피드백이 제공됨
        return;
    } else if (quiz.type === 'four') {
        for (let i = 1; i <= 4; i++) {
@@ -1529,24 +1449,9 @@ function wrongAnswer() {
 
 // 퀴즈 완료 표시
 function markQuizCompleted(quizId) {
-   const elements = document.querySelectorAll('.clickable');
-   let targetElement = null;
-   
-   if (quizId >= 1 && quizId <= 4) {
-       const room1Elements = document.querySelectorAll('#room1 .clickable');
-       targetElement = room1Elements[quizId - 1];
-   }
-   else if (quizId >= 5 && quizId <= 8) {
-       const room2Elements = document.querySelectorAll('#room2 .clickable');
-       targetElement = room2Elements[quizId - 5];
-   }
-   else if (quizId >= 9 && quizId <= 12) {
-       const room3Elements = document.querySelectorAll('#room3 .clickable');
-       targetElement = room3Elements[quizId - 9];
-   }
-   
-   if (targetElement) {
-       targetElement.classList.add('completed');
+   const element = document.querySelector(`.clickable[onclick="openQuiz(${quizId})"]`);
+   if (element) {
+       element.classList.add('completed');
    }
 }
 
@@ -1571,7 +1476,6 @@ function checkRoomCompletion() {
        if (currentRoom < 3) {
            document.getElementById('nextRoomBtn').style.display = 'block';
        }
-       // 방3 완료는 마지막 퀴즈(12번)에서 직접 처리
    } else {
        document.getElementById('nextRoomBtn').style.display = 'none';
    }
@@ -1589,7 +1493,6 @@ function getRoomQuizzes(roomNum) {
 
 // 승리 메시지 표시 (콜백 추가)
 function showVictoryMessage(callback) {
-   // 기존 메시지 제거
    const existingMessages = document.querySelectorAll('.victory-message');
    existingMessages.forEach(msg => msg.remove());
    
@@ -1602,7 +1505,6 @@ function showVictoryMessage(callback) {
        </div>
    `;
    
-   // 스타일 적용
    message.style.cssText = `
        position: fixed;
        top: 0;
@@ -1646,7 +1548,6 @@ function showVictoryMessage(callback) {
    
    document.body.appendChild(message);
    
-   // 애니메이션 키프레임 추가
    if (!document.querySelector('#victoryAnimations')) {
        const style = document.createElement('style');
        style.id = 'victoryAnimations';
@@ -1663,7 +1564,6 @@ function showVictoryMessage(callback) {
        document.head.appendChild(style);
    }
    
-   // 2.5초 후 메시지 제거 및 콜백 실행
    setTimeout(() => {
        message.style.animation = 'victoryFadeOut 0.5s ease-out forwards';
        setTimeout(() => {
@@ -1674,7 +1574,6 @@ function showVictoryMessage(callback) {
        }, 500);
    }, 2500);
    
-   // fadeOut 애니메이션 추가
    const existingStyle = document.querySelector('#victoryAnimations');
    if (existingStyle) {
        existingStyle.textContent += `
@@ -1688,12 +1587,10 @@ function showVictoryMessage(callback) {
 
 // 축하 효과 생성
 function createCelebrationEffect() {
-   // 색종이 효과 생성
    for (let i = 0; i < 50; i++) {
        createConfetti();
    }
    
-   // 계속 지속적으로 색종이 생성
    confettiInterval = setInterval(() => {
        for (let i = 0; i < 10; i++) {
            createConfetti();
@@ -1722,7 +1619,6 @@ function createConfetti() {
    
    document.body.appendChild(confetti);
    
-   // 색종이 애니메이션 추가
    if (!document.querySelector('#confettiAnimation')) {
        const style = document.createElement('style');
        style.id = 'confettiAnimation';
@@ -1737,7 +1633,6 @@ function createConfetti() {
        document.head.appendChild(style);
    }
    
-   // 애니메이션 완료 후 요소 제거
    setTimeout(() => {
        if (confetti.parentNode) {
            confetti.parentNode.removeChild(confetti);
@@ -1749,7 +1644,6 @@ function createConfetti() {
 function nextRoom() {
    const nextRoomNum = currentRoom + 1;
    
-   // 타이머 리셋
    stopRoomTimer();
    
    const videoKey = `room${currentRoom}`;
@@ -1762,7 +1656,7 @@ function nextRoom() {
            showRoom(currentRoom);
            document.getElementById('nextRoomBtn').style.display = 'none';
            updateUI();
-           startRoomTimer(); // 새 방에서 타이머 시작
+           startRoomTimer();
        }, 400);
    });
 }
@@ -1794,6 +1688,30 @@ function updateUI() {
    
    document.getElementById('progress').textContent = `${totalCompleted}/12 완료`;
    document.getElementById('roomInfo').textContent = roomNames[currentRoom] || `방 ${currentRoom}`;
+   updateQuizObjectsState(); // ✨ 퀴즈 상태 업데이트 함수 호출
+}
+
+// ✨ 퀴즈 오브젝트 상태 업데이트 함수 (새로 추가)
+function updateQuizObjectsState() {
+    const lastCompletedQuiz = completedQuizzes.length > 0 ? Math.max(...completedQuizzes) : 0;
+    const nextQuizId = lastCompletedQuiz + 1;
+
+    document.querySelectorAll('.clickable').forEach(element => {
+        const quizId = parseInt(element.getAttribute('onclick').match(/\d+/)[0]);
+
+        // 모든 효과 초기화
+        element.classList.remove('locked', 'next-quiz');
+
+        if (quizId > nextQuizId) {
+            // 아직 풀 수 없는 퀴즈
+            element.classList.add('locked');
+        } else if (quizId === nextQuizId) {
+            // 다음에 풀어야 할 퀴즈
+            if (nextQuizId <= 12) { // 12번 퀴즈까지만 반짝임
+                element.classList.add('next-quiz');
+            }
+        }
+    });
 }
 
 // 모달 닫기
@@ -1818,16 +1736,14 @@ function showMessage(text) {
 
 // 게임 재시작 - 부드러운 전환 추가
 function restartGame() {
-   stopRoomTimer(); // 타이머 중지
-   stopBackgroundMusic(); // 배경음악 중지
+   stopRoomTimer();
+   stopBackgroundMusic();
    
-   // 색종이 인터벌 정지 추가
    if (confettiInterval) {
        clearInterval(confettiInterval);
        confettiInterval = null;
    }
    
-   // 색종이 효과 정리
    const confettis = document.querySelectorAll('div[style*="confettiFall"]');
    confettis.forEach(confetti => {
        if (confetti.parentNode) {
@@ -1835,7 +1751,6 @@ function restartGame() {
        }
    });
    
-   // 상태 초기화
    currentRoom = 1;
    completedQuizzes = [];
    currentQuiz = null;
@@ -1847,17 +1762,15 @@ function restartGame() {
    localStorage.removeItem('gameCompleted');
    
    document.querySelectorAll('.clickable').forEach(element => {
-       element.classList.remove('completed');
+       element.classList.remove('completed', 'locked', 'next-quiz'); // ✨ 클래스 초기화
        element.style.animation = '';
    });
    
-   // 모든 화면 리셋
    document.getElementById('endingScreen').classList.remove('active');
    document.getElementById('gameScreen').classList.remove('active');
    document.getElementById('gameOverScreen').classList.remove('active');
    document.getElementById('gameOverScreen').style.display = 'none';
    
-   // 부드럽게 시작 화면으로 전환
    document.getElementById('endingScreen').style.transition = 'opacity 1s ease-out';
    document.getElementById('endingScreen').style.opacity = '0';
    
@@ -1882,23 +1795,19 @@ function showTransitionWithVideo(videoKey, callback) {
    const transition = document.getElementById('screenTransition');
    const video = document.getElementById('transitionVideo');
    video.muted = false;
-   // 전환 효과 시작
    transition.classList.add('active');
    
-   // 비디오 설정
    const videoSrc = transitionVideos[videoKey];
    let videoLoaded = false;
    let callbackExecuted = false;
    
    if (videoSrc) {
-       // 기존 이벤트 리스너 제거
        video.removeEventListener('loadeddata', handleVideoLoad);
        video.removeEventListener('ended', handleVideoEnd);
        video.removeEventListener('error', handleVideoError);
        
        video.src = videoSrc;
        
-       // 비디오 로드 처리
        function handleVideoLoad() {
            videoLoaded = true;
            video.play().catch(e => {
@@ -1907,18 +1816,15 @@ function showTransitionWithVideo(videoKey, callback) {
            });
        }
        
-       // 비디오 종료 처리
        function handleVideoEnd() {
            executeCallback();
        }
        
-       // 비디오 에러 처리
        function handleVideoError() {
            console.log('비디오 로드 실패, 기본 전환으로 진행');
            executeCallback();
        }
        
-       // 콜백 실행 함수
        function executeCallback() {
            if (callbackExecuted) return;
            callbackExecuted = true;
@@ -1934,15 +1840,12 @@ function showTransitionWithVideo(videoKey, callback) {
            }, 300);
        }
        
-       // 이벤트 리스너 등록
        video.addEventListener('loadeddata', handleVideoLoad, { once: true });
        video.addEventListener('ended', handleVideoEnd, { once: true });
        video.addEventListener('error', handleVideoError, { once: true });
        
-       // 비디오 로드 시작
        video.load();
        
-       // 비디오 로드 타임아웃 (3초)
        setTimeout(() => {
            if (!videoLoaded && !callbackExecuted) {
                console.log('비디오 로드 시간 초과, 기본 전환으로 진행');
@@ -1951,7 +1854,6 @@ function showTransitionWithVideo(videoKey, callback) {
        }, 3000);
        
    } else {
-       // 비디오가 없는 경우 기본 전환 효과
        console.log('비디오 파일 없음, 기본 전환 효과 사용');
        setTimeout(() => {
            if (callback) callback();
@@ -1961,7 +1863,6 @@ function showTransitionWithVideo(videoKey, callback) {
        }, 1500);
    }
    
-   // 최대 대기 시간 (5초) 후 강제 진행
    setTimeout(() => {
        if (!callbackExecuted) {
            console.log('최대 대기 시간 초과, 강제 진행');
@@ -1990,7 +1891,6 @@ document.getElementById('quizModal').addEventListener('click', function(e) {
 
 // 페이지 로드 시 초기화 (사운드 초기화 추가 및 전체 화면 요청)
 window.addEventListener('load', function() {
-    // 사운드 초기화
     initializeSounds();
  
     const gameCompleted = localStorage.getItem('gameCompleted');
@@ -2006,16 +1906,10 @@ window.addEventListener('load', function() {
         const savedQuizzes = localStorage.getItem('completedQuizzes');
         
         if (savedRoom && savedQuizzes) {
-            // ✨ 저장된 게임이 있으면 '이어서 하기' 화면 표시
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('resumeScreen').style.display = 'flex';
         } else {
-            // 저장된 게임이 없으면 시작 화면 표시 (기존 로직)
             document.getElementById('startScreen').style.display = 'flex';
         }
     }
  });
-
-
-
-
