@@ -292,6 +292,34 @@ body {
     box-shadow: 0 2px 8px rgba(0,255,0,0.3);
 }
 
+/* === ✨ 순차적 활성화 스타일 추가 ✨ === */
+.clickable.locked {
+    filter: grayscale(100%);
+    cursor: not-allowed;
+}
+.clickable.locked:hover {
+    animation: none;
+    transform: none;
+    border-color: transparent;
+}
+
+.clickable.next-quiz {
+    animation: nextQuizGlow 1.5s ease-in-out infinite;
+    box-shadow: none; /* 요청사항 반영 */
+}
+
+@keyframes nextQuizGlow {
+    0%, 100% {
+        border-color: rgba(255, 215, 0, 0.8);
+        transform: scale(1);
+    }
+    50% {
+        border-color: rgba(255, 215, 0, 0.4);
+        transform: scale(1.03);
+    }
+}
+/* ======================================= */
+
 /* === ✨ 태블릿 비율에 맞게 위치 재조정 (단위: %) ✨ === */
 /* 방1 오브젝트 위치 */
 .tree { top: 28%; left: 6%; width: 8%; height: 45%; }
@@ -538,4 +566,3 @@ body {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
-
