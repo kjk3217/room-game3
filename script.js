@@ -117,6 +117,22 @@ const quizzes = {
     }
 };
 
+const roomStories = {
+    1: {
+        title: "첫 번째 방: 소리의 근원을 찾아서",
+        content: "드디어 '소리의 탑' 1층, '시작의 방'에 도착했다. 방 안은 희미한 소리들만 맴돌 뿐, 어떤 말도 명확하게 들리지 않는다. 해커 '묵음'은 이곳에 소리의 가장 기본이 되는 원리들을 흩어놓았다.\n\n소리를 되찾는 첫 번째 열쇠는 바로 **'소리의 최소 단위'**를 이해하는 것이다. 흩어진 지식들을 모아 소리의 근원을 파악하고, 두 번째 방으로 향하는 문을 열어라!"
+    },
+    2: {
+        title: "두 번째 방: 소리의 비밀을 풀어라",
+        content: "첫 번째 관문을 통과하자 희미했던 소리들이 조금씩 제자리를 찾기 시작한다. 하지만 '묵음'은 그리 호락호락하지 않다. 2층 '조합의 방'에는 더욱 교묘한 암호들을 숨겨두었다.\n\n이곳의 암호를 풀기 위해서는 각각의 소리들이 **어떤 특징(성질)을 가지고 어떻게 만들어지는지** 알아야 한다. 소리가 만들어지는 비밀을 파헤쳐, '묵음'이 숨겨둔 **울림소리 암호**를 찾아내라!"
+    },
+    3: {
+        title: "세 번째 방: 소리의 질서를 바로잡아라",
+        content: "마침내 마지막 층인 '질서의 방'에 도달했다! 이곳은 '묵음'의 강력한 방해로 모든 소리의 체계가 완전히 무너져 있다. 뒤죽박죽 섞인 소리들을 제자리에 돌려놓아야만 한다.\n\n지금까지 알아낸 모든 지식을 총동원하여, **소리들을 올바른 기준에 따라 분류하고 짝을 지어** 무너진 질서를 바로잡아라. 모든 질서를 되찾았을 때, 우리는 묵음으로부터 세상을 구할 **마지막 암호**를 외칠 수 있을 것이다!"
+    }
+};
+
+
 // === ✨ 전체 화면 실행을 위한 함수 추가 ✨ ===
 function requestFullScreen() {
     const elem = document.documentElement; // 전체 페이지를 대상으로 함
@@ -391,7 +407,9 @@ function loadGameState() {
     const savedRoom = localStorage.getItem('currentRoom');
     if (savedRoom) {
         currentRoom = parseInt(savedRoom);
-        showRoom(currentRoom);
+        showRoom(currentRoom, false);
+    } else {
+        showRoom(1);
     }
     
     completedQuizzes.forEach(quizId => {
@@ -1642,27 +1660,26 @@ function createConfetti() {
 
 // 다음 방으로 이동 (텍스트 없이)
 function nextRoom() {
-   const nextRoomNum = currentRoom + 1;
-   
-   stopRoomTimer();
-   
-   const videoKey = `room${currentRoom}`;
-   showTransitionWithVideo(videoKey, () => {
-       document.getElementById(`room${currentRoom}`).classList.add('exit-left');
-       
-       setTimeout(() => {
-           currentRoom = nextRoomNum;
-           localStorage.setItem('currentRoom', currentRoom);
-           showRoom(currentRoom);
-           document.getElementById('nextRoomBtn').style.display = 'none';
-           updateUI();
-           startRoomTimer();
-       }, 400);
-   });
+    const nextRoomNum = currentRoom + 1;
+    stopRoomTimer();
+
+    const videoKey = `room${currentRoom}`;
+    showTransitionWithVideo(videoKey, () => {
+        document.getElementById(`room${currentRoom}`).classList.add('exit-left');
+        
+        setTimeout(() => {
+            currentRoom = nextRoomNum;
+            localStorage.setItem('currentRoom', currentRoom);
+            showRoom(currentRoom);
+            document.getElementById('nextRoomBtn').style.display = 'none';
+            updateUI();
+        }, 400);
+    });
 }
 
+
 // 방 표시
-function showRoom(roomNum) {
+function showRoom(roomNum, showStory = true) {
    for (let i = 1; i <= 3; i++) {
        const room = document.getElementById(`room${i}`);
        room.style.display = 'none';
@@ -1674,6 +1691,11 @@ function showRoom(roomNum) {
    
    setTimeout(() => {
        currentRoomElement.classList.add('active');
+       if (showStory) {
+           showStoryModal(roomNum);
+       } else {
+            startRoomTimer();
+       }
    }, 100);
 }
 
@@ -1718,6 +1740,22 @@ function updateQuizObjectsState() {
 function closeModal() {
    document.getElementById('quizModal').style.display = 'none';
    currentQuiz = null;
+}
+
+// 스토리 모달 표시
+function showStoryModal(roomNum) {
+    const story = roomStories[roomNum];
+    if (story) {
+        document.getElementById('storyTitle').textContent = story.title;
+        document.getElementById('storyContent').innerHTML = story.content.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+        document.getElementById('storyModal').style.display = 'flex';
+    }
+}
+
+// 스토리 모달 닫기
+function closeStoryModal() {
+    document.getElementById('storyModal').style.display = 'none';
+    startRoomTimer();
 }
 
 // 메시지 표시
@@ -1785,7 +1823,7 @@ function restartGame() {
        document.getElementById('nextRoomBtn').style.display = 'none';
        
        hideTimerWarning();
-       showRoom(1);
+       showRoom(1, false);
        updateUI();
    }, 1000);
 }
