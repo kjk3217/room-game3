@@ -565,4 +565,13 @@ body {
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
+/* Story Modal Styles */
+.story-modal .modal-content {
+    max-width: 80vw;
+    width: 60%; 
+}
 
+.challenge-btn {
+    background: linear-gradient(45deg, #ff9800, #f57c00);
+    color: white;
+}
