@@ -331,7 +331,7 @@ body {
 .door2 { top: 18%; left: 6%; width: 8%; height: 34%; }
 
 /* 방3 오브젝트 위치 */
-.bible { top: 60%; right: 11%; width: 9%; height: 13%; }
+.bible { top: 61%; right: 12%; width: 9%; height: 13%; }
 .shield { top: 41%; left: 28%; width: 9%; height: 17%; }
 .cross { top: 22%; left: 13%; width: 5%; height: 40%; }
 .pillar { top: 58%; right: 8%; width: 6%; height: 28%; }
@@ -954,6 +954,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
