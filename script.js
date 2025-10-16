@@ -2165,11 +2165,11 @@ function showPuzzleHintMessage() {
         <div class="hint-message-content">
             <h3>🎉 퍼즐 완성! 🎉</h3>
             <p style="font-size: 1.6rem; line-height: 1.8; margin: 1.5rem 0;">
-                마지막 문을 열기 위한 <span style="color: #ffd700; font-weight: bold;">힌트</span>를 발견했습니다!
+                마지막 문을 열기 위한 <span style="color: #ffd700; font-weight: bold;">암호의 힌트</span>를 발견했습니다!
             </p>
             <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 10px; margin: 1rem 0;">
                 <p style="font-size: 1.4rem; color: #87ceeb;">
-                    "말의 뜻을 구별해 주는<br>가장 작은 소리의 단위"
+                    "자세히 들려다 보자!"
                 </p>
             </div>
             <button class="challenge-btn" onclick="closeHintMessage()" style="margin-top: 1rem; padding: 1rem 2rem; font-size: 1.4rem;">확인</button>
@@ -2417,6 +2417,7 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
 
