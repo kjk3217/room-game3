@@ -334,8 +334,8 @@ body {
 .bible { top: 61%; right: 12%; width: 9%; height: 13%; }
 .shield { top: 39%; left: 27%; width: 9%; height: 17%; }
 .cross { top: 22%; left: 13%; width: 5%; height: 40%; }
-.pillar { top: 58%; right: 8%; width: 6%; height: 28%; }
-.door3 { top: 18%; right: 26%; width: 10%; height: 40%; }
+.pillar { top: 35%; right: 10%; width: 9%; height: 11%; }
+.door3 { top: 16%; right: 23%; width: 12%; height: 44%; }
 
 /* 모달 */
 .modal {
@@ -954,6 +954,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
