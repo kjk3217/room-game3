@@ -1,5 +1,3 @@
-// 기존 script.js 파일의 모든 내용을 지우고 아래 코드를 붙여넣으세요.
-
 // 게임 상태
 let currentRoom = 1;
 let completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes')) || [];
@@ -7,7 +5,7 @@ let currentQuiz = null;
 
 // 타이머 관련 변수
 let roomTimer = null;
-let timeLeft = 600; // 10분 = 600초
+let timeLeft = 600;
 let tickSound = null;
 let isTimerActive = false;
 
@@ -25,16 +23,15 @@ let puzzleTouchOffsetX = 0;
 let puzzleTouchOffsetY = 0;
 let puzzleInitialParent = null;
 
-// 전환 비디오 설정 (엔딩 비디오 제거)
+// 전환 비디오 설정
 const transitionVideos = {
-    start: 'videos/start_to_room1.mp4',      // 시작 → 방1
-    room1: 'videos/room1_to_room2.mp4',      // 방1 → 방2
-    room2: 'videos/room2_to_room3.mp4'       // 방2 → 방3
+    start: 'videos/start_to_room1.mp4',
+    room1: 'videos/room1_to_room2.mp4',
+    room2: 'videos/room2_to_room3.mp4'
 };
 
 // 퀴즈 데이터
 const quizzes = {
-    // 방 1: 품사의 기본 개념
     1: {
         title: "음운의 개념",
         question: "말의 뜻을 구별해 주는 가장 작은 소리의 단위를 무엇이라고 할까요?",
@@ -65,7 +62,6 @@ const quizzes = {
             '저모음': ['ㅐ', 'ㅏ']
         }
     },
-    // 방 2: 체언과 용언
     5: {
         title: "체언의 종류",
         question: "다음 빈칸에 들어갈 알맞은 음운을 순서대로 채우세요.\n\n1. 초성: 파열음이면서 예사소리이고 입술소리인 음운\n2. 중성: 후설모음이면서 평순모음이고 저모음인 음운\n3. 종성: 비음이면서 입술소리의 음운\n4. 위 세 음운을 묶어 알맞은 단어를 쓰시오.",
@@ -91,7 +87,6 @@ const quizzes = {
         answers: ["130"],
         type: "password"
     },
-    // 방 3: 수식언, 관계언, 독립언
     9: {
         title: "단모음 vs 이중 모음",
         question: "발음할 때 입술 모양이나 혀의 위치가 변하지 않는 모음을 무엇이라고 할까요?",
@@ -140,35 +135,30 @@ const roomStories = {
     }
 };
 
-
-// === ✨ 전체 화면 실행을 위한 함수 추가 ✨ ===
+// 전체 화면 실행 함수
 function requestFullScreen() {
-    const elem = document.documentElement; // 전체 페이지를 대상으로 함
+    const elem = document.documentElement;
     if (elem.requestFullscreen) {
         elem.requestFullscreen().catch(console.error);
-    } else if (elem.mozRequestFullScreen) { // Firefox
+    } else if (elem.mozRequestFullScreen) {
         elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari, Opera
+    } else if (elem.webkitRequestFullscreen) {
         elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { // IE/Edge
+    } else if (elem.msRequestFullscreen) {
         elem.msRequestFullscreen();
     }
 }
-// ===========================================
 
-// 사운드 초기화 및 로드
+// 사운드 초기화
 function initializeSounds() {
     try {
-        // 배경음악 초기화 (엔딩용)
         backgroundMusic = new Audio('sounds/ending_music.mp3');
         backgroundMusic.loop = true;
         backgroundMusic.volume = 0.6;
         
-        // 클릭 사운드 초기화
         clickSound = new Audio('sounds/click_sound.mp3');
         clickSound.volume = 0.8;
         
-        // 사운드 사전 로드
         const loadPromises = [
             new Promise((resolve, reject) => {
                 backgroundMusic.addEventListener('canplaythrough', resolve, { once: true });
@@ -200,7 +190,7 @@ function initializeSounds() {
 function playClickSound() {
     if (soundsLoaded && clickSound) {
         try {
-            clickSound.currentTime = 0; // 사운드를 처음부터 재생
+            clickSound.currentTime = 0;
             clickSound.play().catch(error => {
                 console.log('클릭 사운드 재생 실패:', error);
             });
@@ -236,12 +226,11 @@ function stopBackgroundMusic() {
     }
 }
 
-// 게임 시작 - 비디오 전환 포함 (텍스트 제거)
+// 게임 시작
 function startGame() {
-    requestFullScreen(); // ✨ 시작 시 전체화면 요청
+    requestFullScreen();
     console.log('게임 시작 버튼 클릭됨');
     
-    // 비디오 전환 사용 (텍스트 없이)
     showTransitionWithVideo('start', () => {
         document.getElementById('startScreen').classList.add('fade-out');
         setTimeout(() => {
@@ -250,7 +239,7 @@ function startGame() {
             setTimeout(() => {
                 document.getElementById('gameScreen').classList.add('active');
                 showRoom(1);
-                startRoomTimer(); // 타이머 시작
+                startRoomTimer();
             }, 50);
             loadGameState();
             updateUI();
@@ -258,11 +247,10 @@ function startGame() {
     });
 }
 
-// ✨ 게임 이어하기 함수 (새로 추가) ✨
+// 게임 이어하기
 function requestFullScreenAndResume() {
-    requestFullScreen(); // 전체화면 요청
+    requestFullScreen();
     
-    // 화면 전환
     const resumeScreen = document.getElementById('resumeScreen');
     resumeScreen.style.transition = 'opacity 0.5s ease';
     resumeScreen.style.opacity = '0';
@@ -274,34 +262,32 @@ function requestFullScreenAndResume() {
             document.getElementById('gameScreen').classList.add('active');
             loadGameState();
             updateUI();
-            startRoomTimer(); // 저장된 게임에서도 타이머 시작
+            startRoomTimer();
         }, 50);
     }, 500);
 }
 
-
 // 타이머 초기화
 function initTimer() {
-    // Web Audio API를 사용해 똑딱 소리 생성
     try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
         function createTickSound() {
-            const oscillator = audio.createOscillator();
-            const gainNode = audio.createGain();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
             
             oscillator.connect(gainNode);
-            gainNode.connect(audio.destination);
+            gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.setValueAtTime(800, audio.currentTime);
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
             oscillator.type = 'square';
             
-            gainNode.gain.setValueAtTime(0, audio.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.1, audio.currentTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
             
-            oscillator.start(audio.currentTime);
-            oscillator.stop(audio.currentTime + 0.1);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
         }
         
         tickSound = createTickSound;
@@ -315,7 +301,7 @@ function initTimer() {
 function startRoomTimer() {
     if (isTimerActive) return;
     
-    timeLeft = 420; // 7분 리셋
+    timeLeft = 420;
     isTimerActive = true;
     updateTimerDisplay();
     initTimer();
@@ -324,7 +310,6 @@ function startRoomTimer() {
         timeLeft--;
         updateTimerDisplay();
         
-        // 똑딱 소리 재생 (마지막 2분)
         if (timeLeft <= 120 && tickSound) {
             try {
                 tickSound();
@@ -333,12 +318,10 @@ function startRoomTimer() {
             }
         }
         
-        // 시간 경고
-        if (timeLeft === 120) { // 2분 남음
+        if (timeLeft === 120) {
             showTimerWarning();
         }
         
-        // 시간 종료
         if (timeLeft <= 0) {
             gameOver();
         }
@@ -364,12 +347,11 @@ function updateTimerDisplay() {
     const timerElement = document.getElementById('timer');
     timerElement.textContent = display;
     
-    // 타이머 색상 변경
     timerElement.classList.remove('warning', 'danger');
     
-    if (timeLeft <= 60) { // 1분 이하
+    if (timeLeft <= 60) {
         timerElement.classList.add('danger');
-    } else if (timeLeft <= 120) { // 2분 이하
+    } else if (timeLeft <= 120) {
         timerElement.classList.add('warning');
     }
 }
@@ -381,7 +363,7 @@ function showTimerWarning() {
     
     setTimeout(() => {
         hideTimerWarning();
-    }, 5000); // 5초 후 숨김
+    }, 5000);
 }
 
 // 타이머 경고 숨김
@@ -393,20 +375,17 @@ function hideTimerWarning() {
 // 게임오버
 function gameOver() {
     stopRoomTimer();
-    stopBackgroundMusic(); // 배경음악 중지
+    stopBackgroundMusic();
     
-    // 모든 화면 숨김
     document.getElementById('gameScreen').style.display = 'none';
     document.getElementById('endingScreen').style.display = 'none';
     document.getElementById('startScreen').style.display = 'none';
     
-    // 게임오버 화면 표시
     document.getElementById('gameOverScreen').style.display = 'flex';
     setTimeout(() => {
         document.getElementById('gameOverScreen').classList.add('active');
     }, 100);
     
-    // 모달 닫기
     closeModal();
 }
 
@@ -425,14 +404,13 @@ function loadGameState() {
     });
     
     checkRoomCompletion();
-    updateQuizObjectsState(); // ✨ 퀴즈 상태 업데이트 함수 호출
+    updateQuizObjectsState();
 }
 
-// ✨ 퀴즈 열기 함수 수정
+// 퀴즈 열기
 function openQuiz(quizId) {
     playClickSound();
 
-    // 순차적 퀴즈 확인
     const lastCompletedQuiz = completedQuizzes.length > 0 ? Math.max(...completedQuizzes) : 0;
     const isLocked = quizId > lastCompletedQuiz + 1;
 
@@ -474,7 +452,7 @@ function openQuiz(quizId) {
     document.getElementById('quizModal').style.display = 'flex';
 }
 
-// 완료된 퀴즈 표시 함수
+// 완료된 퀴즈 표시
 function createCompletedQuizDisplay(quiz) {
     const inputContainer = document.getElementById('quizInput');
     inputContainer.innerHTML = '';
@@ -649,8 +627,7 @@ function createCompletedQuizDisplay(quiz) {
     }
 }
 
-
-// 새로운 함수: 단어 분류 게임 생성 (4번 퀴즈용)
+// 단어 분류 게임 생성
 function createWordClassificationGame() {
     const inputContainer = document.getElementById('quizInput');
     inputContainer.innerHTML = '';
@@ -702,10 +679,7 @@ function createWordClassificationGame() {
     setupDropZones(unclassifiedContainer, ...dropZonesContainer.querySelectorAll('.category-drop-zone'));
 }
 
-
-// =================================================================
-// ✨ 4번 문제 정답 확인 로직 수정 ✨
-// =================================================================
+// 단어 분류 완료 확인
 function checkWordClassificationCompletion() {
     const quiz = quizzes[currentQuiz];
     const unclassifiedContainer = document.querySelector('.unclassified-words-container');
@@ -749,8 +723,6 @@ function checkWordClassificationCompletion() {
         }, wordElements.length * 100 + 500);
     }
 }
-// =================================================================
-
 
 // 매칭 게임 생성
 function createMatchingGame() {
@@ -796,7 +768,7 @@ function createMatchingGame() {
         gap: 15px;
     `;
     
-   const shuffledLaws = [...quiz.laws].sort(() => Math.random() - 0.5);
+    const shuffledLaws = [...quiz.laws].sort(() => Math.random() - 0.5);
     
     quiz.periods.forEach((period, index) => {
         const periodItem = document.createElement('div');
@@ -843,7 +815,6 @@ function createMatchingGame() {
         lawItem.addEventListener('click', () => selectLaw(lawItem));
         lawsContainer.appendChild(lawItem);
     });
-    
     
     gameContainer.appendChild(periodsContainer);
     gameContainer.appendChild(arrowContainer);
@@ -910,93 +881,90 @@ function createWordSortGame() {
         min-height: 120px;
         align-items: flex-start;
         justify-content: center;
-        width: 100%
-   `;
+        width: 100%;
+    `;
    
+    const shuffledWords = [...quiz.shuffledWords].sort(() => Math.random() - 0.5);
    
-   const shuffledWords = [...quiz.shuffledWords].sort(() => Math.random() - 0.5);
+    shuffledWords.forEach((word, index) => {
+        const wordElement = createWordElement(word, index);
+        shuffledContainer.appendChild(wordElement);
+    });
    
-   shuffledWords.forEach((word, index) => {
-       const wordElement = createWordElement(word, index);
-       shuffledContainer.appendChild(wordElement);
-   });
+    gameContainer.appendChild(instructionText);
+    gameContainer.appendChild(shuffledContainer);
+    gameContainer.appendChild(answerContainer);
    
-   gameContainer.appendChild(instructionText);
-   gameContainer.appendChild(shuffledContainer);
-   gameContainer.appendChild(answerContainer);
+    inputContainer.appendChild(gameContainer);
    
-   inputContainer.appendChild(gameContainer);
+    setupDropZones(shuffledContainer, answerContainer);
    
-   setupDropZones(shuffledContainer, answerContainer);
-   
-   window.currentWordOrder = [];
-   window.correctWordOrder = quiz.correctOrder;
+    window.currentWordOrder = [];
+    window.correctWordOrder = quiz.correctOrder;
 }
 
 // 단어 요소 생성
 function createWordElement(word, index) {
-   const wordElement = document.createElement('div');
-   wordElement.className = 'word-element';
-   wordElement.dataset.word = word;
-   wordElement.dataset.index = index;
-   wordElement.textContent = word;
-   wordElement.draggable = true;
+    const wordElement = document.createElement('div');
+    wordElement.className = 'word-element';
+    wordElement.dataset.word = word;
+    wordElement.dataset.index = index;
+    wordElement.textContent = word;
+    wordElement.draggable = true;
    
-   wordElement.style.cssText = `
-       background: linear-gradient(135deg, #4a90e2, #357abd);
-       color: white;
-       padding: 10px 20px;
-       border-radius: 8px;
-       cursor: grab;
-       user-select: none;
-       font-weight: bold;
-       font-size: 1.5rem;
-       border: 2px solid transparent;
-       transition: all 0.3s ease;
-       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-   `;
+    wordElement.style.cssText = `
+        background: linear-gradient(135deg, #4a90e2, #357abd);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: grab;
+        user-select: none;
+        font-weight: bold;
+        font-size: 1.5rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    `;
    
-   wordElement.addEventListener('dragstart', handleDragStart);
-   wordElement.addEventListener('dragend', handleDragEnd);
+    wordElement.addEventListener('dragstart', handleDragStart);
+    wordElement.addEventListener('dragend', handleDragEnd);
+    
+    wordElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+    wordElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+    wordElement.addEventListener('touchend', handleTouchEnd, { passive: false });
    
-   wordElement.addEventListener('touchstart', handleTouchStart, { passive: false });
-   wordElement.addEventListener('touchmove', handleTouchMove, { passive: false });
-   wordElement.addEventListener('touchend', handleTouchEnd, { passive: false });
-   
-   return wordElement;
+    return wordElement;
 }
 
-// 드롭 영역 설정 (가변 인자 ...containers 사용)
+// 드롭 영역 설정
 function setupDropZones(...containers) {
-   containers.forEach(container => {
-       if (container) {
+    containers.forEach(container => {
+        if (container) {
             container.addEventListener('dragover', handleDragOver);
             container.addEventListener('drop', handleDrop);
-       }
-   });
+        }
+    });
 }
-
 
 // 드래그 시작
 function handleDragStart(e) {
-   e.dataTransfer.setData('text/plain', e.target.dataset.index);
-   e.target.classList.add('dragging'); // Use class for visual feedback
+    e.dataTransfer.setData('text/plain', e.target.dataset.index);
+    e.target.classList.add('dragging');
 }
 
 // 드래그 종료
 function handleDragEnd(e) {
-   e.target.classList.remove('dragging');
+    e.target.classList.remove('dragging');
 }
-
 
 // 드래그 오버
 function handleDragOver(e) {
-   e.preventDefault();
-   if (e.currentTarget.classList.contains('answer-words-container') || e.currentTarget.classList.contains('category-drop-zone')) {
+    e.preventDefault();
+    if (e.currentTarget.classList.contains('answer-words-container') || e.currentTarget.classList.contains('category-drop-zone')) {
         e.currentTarget.style.background = 'rgba(0,150,0,0.3)';
-   } else {
+    } else {
         e.currentTarget.style.background = 'rgba(0,0,0,0.4)';
-   }
+    }
 }
 
 // 드롭 처리
@@ -1032,8 +1000,7 @@ function resetDropZoneBackground(container) {
     }
 }
 
-
-// === ✨ 터치 이벤트 핸들러 개선 ✨ ===
+// 터치 이벤트 핸들러
 let draggedTouchElement = null;
 let touchOffsetX = 0;
 let touchOffsetY = 0;
@@ -1097,576 +1064,480 @@ function handleTouchEnd(e) {
 
     draggedTouchElement = null;
 }
-// ===================================
-
 
 // 단어 정렬 완료 확인
 function checkWordSortCompletion() {
-   const answerContainer = document.querySelector('.answer-words-container');
-   const wordsInAnswer = Array.from(answerContainer.querySelectorAll('.word-element'))
-       .map(el => el.dataset.word);
+    const answerContainer = document.querySelector('.answer-words-container');
+    const wordsInAnswer = Array.from(answerContainer.querySelectorAll('.word-element'))
+        .map(el => el.dataset.word);
    
-   if (wordsInAnswer.length === window.correctWordOrder.length) {
-       const isCorrectOrder = wordsInAnswer.every((word, index) => 
-           word === window.correctWordOrder[index]
-       );
+    if (wordsInAnswer.length === window.correctWordOrder.length) {
+        const isCorrectOrder = wordsInAnswer.every((word, index) => 
+            word === window.correctWordOrder[index]
+        );
        
-       if (isCorrectOrder) {
-           const wordElements = answerContainer.querySelectorAll('.word-element');
-           wordElements.forEach((el, index) => {
-               setTimeout(() => {
-                   el.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
-                   el.style.transform = 'scale(1.05)';
-                   setTimeout(() => {
-                       el.style.transform = 'scale(1)';
-                   }, 200);
-               }, index * 100);
-           });
+        if (isCorrectOrder) {
+            const wordElements = answerContainer.querySelectorAll('.word-element');
+            wordElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
+                    el.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        el.style.transform = 'scale(1)';
+                    }, 200);
+                }, index * 100);
+            });
            
-           setTimeout(() => {
-               correctAnswer();
-           }, wordsInAnswer.length * 100 + 500);
-       }
-   }
+            setTimeout(() => {
+                correctAnswer();
+            }, wordsInAnswer.length * 100 + 500);
+        }
+    }
 }
 
 // 시대 선택
 function selectPeriod(periodElement) {
-   document.querySelectorAll('.period-item').forEach(item => {
-       item.style.borderColor = 'transparent';
-       item.style.boxShadow = 'none';
-   });
+    document.querySelectorAll('.period-item').forEach(item => {
+        item.style.borderColor = 'transparent';
+        item.style.boxShadow = 'none';
+    });
    
-   window.selectedPeriod = periodElement.dataset.period;
-   periodElement.style.borderColor = '#ffd700';
-   periodElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.6)';
+    window.selectedPeriod = periodElement.dataset.period;
+    periodElement.style.borderColor = '#ffd700';
+    periodElement.style.boxShadow = '0 0 15px rgba(255,215,0,0.6)';
 }
 
 // 법 선택 및 매칭
 function selectLaw(lawElement) {
-   if (!window.selectedPeriod) {
-       showMessage("먼저 품사를 선택해주세요!");
-       return;
-   }
+    if (!window.selectedPeriod) {
+        showMessage("먼저 품사를 선택해주세요!");
+        return;
+    }
    
-   const selectedLaw = lawElement.dataset.law;
+    const selectedLaw = lawElement.dataset.law;
    
-   window.currentMatches[window.selectedPeriod] = selectedLaw;
+    window.currentMatches[window.selectedPeriod] = selectedLaw;
    
-   const isCorrect = window.correctMatches[window.selectedPeriod] === selectedLaw;
+    const isCorrect = window.correctMatches[window.selectedPeriod] === selectedLaw;
    
-   if (isCorrect) {
-       lawElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
-       lawElement.style.borderColor = '#00ff00';
-       lawElement.style.pointerEvents = 'none';
+    if (isCorrect) {
+        lawElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
+        lawElement.style.borderColor = '#00ff00';
+        lawElement.style.pointerEvents = 'none';
        
-       const periodElement = document.querySelector(`[data-period="${window.selectedPeriod}"]`);
-       periodElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
-       periodElement.style.borderColor = '#00ff00';
-       periodElement.style.pointerEvents = 'none';
+        const periodElement = document.querySelector(`[data-period="${window.selectedPeriod}"]`);
+        periodElement.style.background = 'linear-gradient(135deg, #4caf50, #2e7d32)';
+        periodElement.style.borderColor = '#00ff00';
+        periodElement.style.pointerEvents = 'none';
        
-       createConnectionLine(periodElement, lawElement);
-   } else {
-       lawElement.style.background = 'linear-gradient(135deg, #f44336, #c62828)';
-       setTimeout(() => {
-           lawElement.style.background = 'linear-gradient(135deg, #4a90e2, #357abd)';
-       }, 1000);
+        createConnectionLine(periodElement, lawElement);
+    } else {
+        lawElement.style.background = 'linear-gradient(135deg, #f44336, #c62828)';
+        setTimeout(() => {
+            lawElement.style.background = 'linear-gradient(135deg, #4a90e2, #357abd)';
+        }, 1000);
        
-       delete window.currentMatches[window.selectedPeriod];
-   }
+        delete window.currentMatches[window.selectedPeriod];
+    }
    
-   document.querySelectorAll('.period-item').forEach(item => {
-       if (!item.style.pointerEvents || item.style.pointerEvents === 'auto') {
+    document.querySelectorAll('.period-item').forEach(item => {
+        if (!item.style.pointerEvents || item.style.pointerEvents === 'auto') {
             item.style.borderColor = 'transparent';
             item.style.boxShadow = 'none';
-       }
-   });
-   window.selectedPeriod = null;
+        }
+    });
+    window.selectedPeriod = null;
    
-   const totalMatchesNeeded = Object.keys(window.correctMatches).length;
-   if (Object.keys(window.currentMatches).length === totalMatchesNeeded) {
-       setTimeout(() => {
-           checkMatchingComplete();
-       }, 500);
-   }
+    const totalMatchesNeeded = Object.keys(window.correctMatches).length;
+    if (Object.keys(window.currentMatches).length === totalMatchesNeeded) {
+        setTimeout(() => {
+            checkMatchingComplete();
+        }, 500);
+    }
 }
 
-// 연결선 생성 (시각적 효과)
+// 연결선 생성
 function createConnectionLine(periodElement, lawElement) {
-   const checkMark = document.createElement('div');
-   checkMark.textContent = '✓';
-   checkMark.style.cssText = `
-       position: absolute;
-       top: 50%;
-       left: 50%;
-       transform: translate(-50%, -50%);
-       color: #00ff00;
-       font-size: 2rem;
-       font-weight: bold;
-       z-index: 100;
-       animation: checkmarkPop 0.5s ease-out;
-       pointer-events: none;
-   `;
+    const checkMark = document.createElement('div');
+    checkMark.textContent = '✓';
+    checkMark.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #00ff00;
+        font-size: 2rem;
+        font-weight: bold;
+        z-index: 100;
+        animation: checkmarkPop 0.5s ease-out;
+        pointer-events: none;
+    `;
    
-   periodElement.style.position = 'relative';
-   periodElement.appendChild(checkMark);
+    periodElement.style.position = 'relative';
+    periodElement.appendChild(checkMark);
    
-   if (!document.querySelector('#checkmarkAnimation')) {
-       const style = document.createElement('style');
-       style.id = 'checkmarkAnimation';
-       style.textContent = `
-           @keyframes checkmarkPop {
-               0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-               50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-               100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-           }
-       `;
-       document.head.appendChild(style);
-   }
+    if (!document.querySelector('#checkmarkAnimation')) {
+        const style = document.createElement('style');
+        style.id = 'checkmarkAnimation';
+        style.textContent = `
+            @keyframes checkmarkPop {
+                0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 }
 
 // 매칭 완료 확인
 function checkMatchingComplete() {
-   let allCorrect = true;
+    let allCorrect = true;
    
-   for (const [period, law] of Object.entries(window.currentMatches)) {
-       if (window.correctMatches[period] !== law) {
-           allCorrect = false;
-           break;
-       }
-   }
+    for (const [period, law] of Object.entries(window.currentMatches)) {
+        if (window.correctMatches[period] !== law) {
+            allCorrect = false;
+            break;
+        }
+    }
    
-   if (allCorrect && Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
-       correctAnswer();
-   }
+    if (allCorrect && Object.keys(window.currentMatches).length === Object.keys(window.correctMatches).length) {
+        correctAnswer();
+    }
 }
 
 // 퀴즈 입력 필드 생성
 function createQuizInput(type) {
-   const inputContainer = document.getElementById('quizInput');
-   inputContainer.innerHTML = '';
+    const inputContainer = document.getElementById('quizInput');
+    inputContainer.innerHTML = '';
    
-   if (type === 'single' || type === 'password') {
-       const input = document.createElement('input');
-       input.type = 'text';
-       input.id = 'quizAnswer';
-       input.placeholder = '정답을 입력하세요...';
-       input.addEventListener('keypress', function(e) {
-           if (e.key === 'Enter') checkAnswer();
-       });
-       inputContainer.appendChild(input);
-       setTimeout(() => input.focus(), 100);
-   } else if (type === 'four') {
-       const container = document.createElement('div');
-       container.className = 'four-inputs';
-       for (let i = 1; i <= 4; i++) {
-           const input = document.createElement('input');
-           input.type = 'text';
-           input.id = `answer${i}`;
-           input.placeholder = `${i}번 정답`;
-           input.addEventListener('keypress', function(e) {
-               if (e.key === 'Enter') checkAnswer();
-           });
-           container.appendChild(input);
-       }
-       inputContainer.appendChild(container);
-       setTimeout(() => document.getElementById('answer1').focus(), 100);
-   } else if (type === 'matching') {
-       createMatchingGame();
-   } else if (type === 'word_sort') {
-       createWordSortGame();
-   } else if (type === 'word_classification') {
-       createWordClassificationGame();
-   } else if (type === 'textarea') {
-       const textarea = document.createElement('textarea');
-       textarea.id = 'quizAnswer';
-       textarea.placeholder = '정답을 정확히 입력하세요...';
-       textarea.addEventListener('keypress', function(e) {
-           if (e.key === 'Enter' && !e.shiftKey) {
-               e.preventDefault();
-               checkAnswer();
-           }
-       });
-       inputContainer.appendChild(textarea);
-       setTimeout(() => textarea.focus(), 100);
-   }
+    if (type === 'single' || type === 'password') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'quizAnswer';
+        input.placeholder = '정답을 입력하세요...';
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkAnswer();
+        });
+        inputContainer.appendChild(input);
+        setTimeout(() => input.focus(), 100);
+    } else if (type === 'four') {
+        const container = document.createElement('div');
+        container.className = 'four-inputs';
+        for (let i = 1; i <= 4; i++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = `answer${i}`;
+            input.placeholder = `${i}번 정답`;
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkAnswer();
+            });
+            container.appendChild(input);
+        }
+        inputContainer.appendChild(container);
+        setTimeout(() => document.getElementById('answer1').focus(), 100);
+    } else if (type === 'matching') {
+        createMatchingGame();
+    } else if (type === 'word_sort') {
+        createWordSortGame();
+    } else if (type === 'word_classification') {
+        createWordClassificationGame();
+    } else if (type === 'textarea') {
+        const textarea = document.createElement('textarea');
+        textarea.id = 'quizAnswer';
+        textarea.placeholder = '정답을 정확히 입력하세요...';
+        textarea.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                checkAnswer();
+            }
+        });
+        inputContainer.appendChild(textarea);
+        setTimeout(() => textarea.focus(), 100);
+    }
    
-   const submitBtn = document.querySelector('.submit-btn');
-   const closeBtn = document.querySelector('.close-btn');
+    const submitBtn = document.querySelector('.submit-btn');
+    const closeBtn = document.querySelector('.close-btn');
    
-   if (submitBtn) {
-       submitBtn.style.display = 'inline-block';
-   }
+    if (submitBtn) {
+        submitBtn.style.display = 'inline-block';
+    }
    
-   if (closeBtn) {
-       closeBtn.textContent = '닫기';
-       closeBtn.style.background = 'linear-gradient(45deg, #f44336, #c62828)';
-   }
+    if (closeBtn) {
+        closeBtn.textContent = '닫기';
+        closeBtn.style.background = 'linear-gradient(45deg, #f44336, #c62828)';
+    }
 }
 
-// 정답 확인 - 마지막 퀴즈(12번) 처리 수정
+// 정답 확인
 function checkAnswer() {
-   const quiz = quizzes[currentQuiz];
-   let userAnswer = '';
+    const quiz = quizzes[currentQuiz];
+    let userAnswer = '';
    
-   if (quiz.type === 'matching' || quiz.type === 'word_sort' || quiz.type === 'word_classification') {
-       return;
-   } else if (quiz.type === 'four') {
-       const answers = [];
-       for (let i = 1; i <= 4; i++) {
-           const value = document.getElementById(`answer${i}`).value.trim();
-           answers.push(value);
-       }
+    if (quiz.type === 'matching' || quiz.type === 'word_sort' || quiz.type === 'word_classification') {
+        return;
+    } else if (quiz.type === 'four') {
+        const answers = [];
+        for (let i = 1; i <= 4; i++) {
+            const value = document.getElementById(`answer${i}`).value.trim();
+            answers.push(value);
+        }
        
-       const correctAnswers = quiz.answers;
-       let isCorrect = true;
+        const correctAnswers = quiz.answers;
+        let isCorrect = true;
        
-       for (let i = 0; i < 4; i++) {
-           if (normalizeAnswer(answers[i]) !== normalizeAnswer(correctAnswers[i])) {
-               isCorrect = false;
-               break;
-           }
-       }
+        for (let i = 0; i < 4; i++) {
+            if (normalizeAnswer(answers[i]) !== normalizeAnswer(correctAnswers[i])) {
+                isCorrect = false;
+                break;
+            }
+        }
        
-       if (isCorrect) {
-           correctAnswer();
-       } else {
-           wrongAnswer();
-       }
-       return;
-   } else {
-       userAnswer = document.getElementById('quizAnswer').value.trim();
-   }
+        if (isCorrect) {
+            correctAnswer();
+        } else {
+            wrongAnswer();
+        }
+        return;
+    } else {
+        userAnswer = document.getElementById('quizAnswer').value.trim();
+    }
    
-   const normalizedAnswer = normalizeAnswer(userAnswer);
-   const isCorrect = quiz.answers.some(answer => 
-       normalizeAnswer(answer) === normalizedAnswer
-   );
+    const normalizedAnswer = normalizeAnswer(userAnswer);
+    const isCorrect = quiz.answers.some(answer => 
+        normalizeAnswer(answer) === normalizedAnswer
+    );
    
-   if (isCorrect) {
-       if (currentQuiz === 12) {
-           correctAnswerForFinalQuiz();
-       } else {
-           correctAnswer();
-       }
-   } else {
-       wrongAnswer();
-   }
+    if (isCorrect) {
+        if (currentQuiz === 12) {
+            correctAnswerForFinalQuiz();
+        } else {
+            correctAnswer();
+        }
+    } else {
+        wrongAnswer();
+    }
 }
 
-// 마지막 퀴즈 정답 처리 - 수정됨 (축하 메시지 제거, 바로 엔딩)
+// 마지막 퀴즈 정답 처리
 function correctAnswerForFinalQuiz() {
-   completedQuizzes.push(currentQuiz);
-   localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
+    completedQuizzes.push(currentQuiz);
+    localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
    
-   markQuizCompleted(currentQuiz);
-   updateUI();
+    markQuizCompleted(currentQuiz);
+    updateUI();
    
-   const modal = document.getElementById('quizModal');
-   modal.style.transition = 'all 0.5s ease-out';
-   modal.style.opacity = '0';
-   modal.style.transform = 'scale(0.9)';
+    const modal = document.getElementById('quizModal');
+    modal.style.transition = 'all 0.5s ease-out';
+    modal.style.opacity = '0';
+    modal.style.transform = 'scale(0.9)';
    
-   setTimeout(() => {
-       closeModal();
-       modal.style.transition = '';
-       modal.style.opacity = '';
-       modal.style.transform = '';
+    setTimeout(() => {
+        closeModal();
+        modal.style.transition = '';
+        modal.style.opacity = '';
+        modal.style.transform = '';
        
-       setTimeout(() => {
-           startEndingSequence();
-       }, 300);
-   }, 500);
+        setTimeout(() => {
+            startEndingSequence();
+        }, 300);
+    }, 500);
 }
 
-// 엔딩 시퀀스 시작 (최종 메시지 제거 + 배경음악 추가)
+// 엔딩 시퀀스 시작
 function startEndingSequence() {
-   stopRoomTimer();
+    stopRoomTimer();
    
-   const fadeOverlay = document.createElement('div');
-   fadeOverlay.id = 'fadeOverlay';
-   fadeOverlay.style.cssText = `
-       position: fixed;
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100%;
-       background: black;
-       z-index: 8000;
-       opacity: 0;
-       transition: opacity 2s ease-in-out;
-   `;
-   document.body.appendChild(fadeOverlay);
+    const fadeOverlay = document.createElement('div');
+    fadeOverlay.id = 'fadeOverlay';
+    fadeOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: black;
+        z-index: 8000;
+        opacity: 0;
+        transition: opacity 2s ease-in-out;
+    `;
+    document.body.appendChild(fadeOverlay);
    
-   setTimeout(() => {
-       fadeOverlay.style.opacity = '1';
-   }, 100);
+    setTimeout(() => {
+        fadeOverlay.style.opacity = '1';
+    }, 100);
    
-   setTimeout(() => {
-       document.getElementById('gameScreen').style.display = 'none';
+    setTimeout(() => {
+        document.getElementById('gameScreen').style.display = 'none';
        
-       const endingScreen = document.getElementById('endingScreen');
-       endingScreen.style.display = 'flex';
-       endingScreen.style.opacity = '1';
-       endingScreen.style.transform = 'scale(1.5)';
-       endingScreen.classList.add('active');
+        const endingScreen = document.getElementById('endingScreen');
+        endingScreen.style.display = 'flex';
+        endingScreen.style.opacity = '1';
+        endingScreen.style.transform = 'scale(1.5)';
+        endingScreen.classList.add('active');
 
-       playBackgroundMusic();
+        playBackgroundMusic();
        
-       setTimeout(() => {
-           fadeOverlay.style.opacity = '0';
+        setTimeout(() => {
+            fadeOverlay.style.opacity = '0';
            
-           endingScreen.style.transition = 'transform 3s ease-out';
-           endingScreen.style.transform = 'scale(1)';
+            endingScreen.style.transition = 'transform 3s ease-out';
+            endingScreen.style.transform = 'scale(1)';
            
-           setTimeout(() => {
-               if (fadeOverlay.parentNode) {
-                   fadeOverlay.parentNode.removeChild(fadeOverlay);
-               }
+            setTimeout(() => {
+                if (fadeOverlay.parentNode) {
+                    fadeOverlay.parentNode.removeChild(fadeOverlay);
+                }
                
-               createCelebrationEffect();
+                createCelebrationEffect();
                
-               localStorage.setItem('gameCompleted', 'true');
-           }, 2000);
-       }, 500);
-   }, 2000);
+                localStorage.setItem('gameCompleted', 'true');
+            }, 2000);
+        }, 500);
+    }, 2000);
 }
 
 // 답안 정규화
 function normalizeAnswer(answer) {
-   return answer.toLowerCase()
-               .replace(/\s+/g, '')
-               .replace(/[이가을를의에서]/g, '');
+    return answer.toLowerCase()
+                .replace(/\s+/g, '')
+                .replace(/[이가을를의에서]/g, '');
 }
 
 // 정답 처리
 function correctAnswer() {
-   if (!completedQuizzes.includes(currentQuiz)) {
+    if (!completedQuizzes.includes(currentQuiz)) {
         completedQuizzes.push(currentQuiz);
-   }
-   localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
+    }
+    localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
    
-   markQuizCompleted(currentQuiz);
-   closeModal();
-   updateUI();
+    markQuizCompleted(currentQuiz);
+    closeModal();
+    updateUI();
    
-   playCompletionEffect();
-   checkRoomCompletion();
-   updateQuizObjectsState(); // ✨ 퀴즈 상태 업데이트 함수 호출
+    playCompletionEffect();
+    checkRoomCompletion();
+    updateQuizObjectsState();
 }
 
 // 오답 처리
 function wrongAnswer() {
-   showMessage("다시 입력해 주세요");
+    showMessage("다시 입력해 주세요");
    
-   const quiz = quizzes[currentQuiz];
-   if (quiz.type === 'matching') {
-       return;
-   } else if (quiz.type === 'four') {
-       for (let i = 1; i <= 4; i++) {
-           document.getElementById(`answer${i}`).value = '';
-       }
-       document.getElementById('answer1').focus();
-   } else {
-       document.getElementById('quizAnswer').value = '';
-       document.getElementById('quizAnswer').focus();
-   }
+    const quiz = quizzes[currentQuiz];
+    if (quiz.type === 'matching') {
+        return;
+    } else if (quiz.type === 'four') {
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`answer${i}`).value = '';
+        }
+        document.getElementById('answer1').focus();
+    } else {
+        document.getElementById('quizAnswer').value = '';
+        document.getElementById('quizAnswer').focus();
+    }
 }
 
 // 퀴즈 완료 표시
 function markQuizCompleted(quizId) {
-   const element = document.querySelector(`.clickable[onclick="openQuiz(${quizId})"]`);
-   if (element) {
-       element.classList.add('completed');
-   }
+    const element = document.querySelector(`.clickable[onclick="openQuiz(${quizId})"]`);
+    if (element) {
+        element.classList.add('completed');
+    }
 }
 
 // 완료 효과
 function playCompletionEffect() {
-   const elements = document.querySelectorAll('.clickable.completed');
-   const lastElement = elements[elements.length - 1];
-   if (lastElement) {
-       lastElement.style.animation = 'none';
-       setTimeout(() => {
-           lastElement.style.animation = 'glow 1s ease-in-out';
-       }, 10);
-   }
+    const elements = document.querySelectorAll('.clickable.completed');
+    const lastElement = elements[elements.length - 1];
+    if (lastElement) {
+        lastElement.style.animation = 'none';
+        setTimeout(() => {
+            lastElement.style.animation = 'glow 1s ease-in-out';
+        }, 10);
+    }
 }
 
 // 방 완료 확인
 function checkRoomCompletion() {
-   const roomQuizzes = getRoomQuizzes(currentRoom);
-   const completed = roomQuizzes.every(id => completedQuizzes.includes(id));
+    const roomQuizzes = getRoomQuizzes(currentRoom);
+    const completed = roomQuizzes.every(id => completedQuizzes.includes(id));
    
-   if (completed) {
-       if (currentRoom < 3) {
-           document.getElementById('nextRoomBtn').style.display = 'block';
-       }
-   } else {
-       document.getElementById('nextRoomBtn').style.display = 'none';
-   }
+    if (completed) {
+        if (currentRoom < 3) {
+            document.getElementById('nextRoomBtn').style.display = 'block';
+        }
+    } else {
+        document.getElementById('nextRoomBtn').style.display = 'none';
+    }
 }
 
 // 방별 퀴즈 ID 반환
 function getRoomQuizzes(roomNum) {
-   switch(roomNum) {
-       case 1: return [1, 2, 3, 4];
-       case 2: return [5, 6, 7, 8];
-       case 3: return [9, 10, 11, 12];
-       default: return [];
-   }
-}
-
-// 승리 메시지 표시 (콜백 추가)
-function showVictoryMessage(callback) {
-   const existingMessages = document.querySelectorAll('.victory-message');
-   existingMessages.forEach(msg => msg.remove());
-   
-   const message = document.createElement('div');
-   message.className = 'victory-message';
-   message.innerHTML = `
-       <div class="victory-content">
-           <h3>🎉 축하합니다! 🎉</h3>
-           <p>마지막 시험을 통과하셨습니다!</p>
-       </div>
-   `;
-   
-   message.style.cssText = `
-       position: fixed;
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100%;
-       background: rgba(0,0,0,0.9);
-       z-index: 3000;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       animation: victoryFadeIn 0.5s ease-out;
-   `;
-   
-   const victoryContent = message.querySelector('.victory-content');
-   victoryContent.style.cssText = `
-       background: linear-gradient(135deg, #4caf50, #2e7d32);
-       padding: 40px;
-       border-radius: 20px;
-       text-align: center;
-       color: white;
-       box-shadow: 0 0 50px rgba(76,175,80,0.8);
-       animation: victoryPulse 1s ease-in-out infinite alternate;
-   `;
-   
-   const h3 = victoryContent.querySelector('h3');
-   h3.style.cssText = `
-       font-size: 2.5rem;
-       margin-bottom: 20px;
-       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-   `;
-   
-   const paragraphs = victoryContent.querySelectorAll('p');
-   paragraphs.forEach(p => {
-       p.style.cssText = `
-           font-size: 1.3rem;
-           margin-bottom: 15px;
-           line-height: 1.4;
-       `;
-   });
-   
-   document.body.appendChild(message);
-   
-   if (!document.querySelector('#victoryAnimations')) {
-       const style = document.createElement('style');
-       style.id = 'victoryAnimations';
-       style.textContent = `
-           @keyframes victoryFadeIn {
-               from { opacity: 0; transform: scale(0.8); }
-               to { opacity: 1; transform: scale(1); }
-           }
-           @keyframes victoryPulse {
-               from { transform: scale(1); box-shadow: 0 0 50px rgba(76,175,80,0.8); }
-               to { transform: scale(1.02); box-shadow: 0 0 70px rgba(76,175,80,1); }
-           }
-       `;
-       document.head.appendChild(style);
-   }
-   
-   setTimeout(() => {
-       message.style.animation = 'victoryFadeOut 0.5s ease-out forwards';
-       setTimeout(() => {
-           if (message.parentNode) {
-               message.parentNode.removeChild(message);
-           }
-           if (callback) callback();
-       }, 500);
-   }, 2500);
-   
-   const existingStyle = document.querySelector('#victoryAnimations');
-   if (existingStyle) {
-       existingStyle.textContent += `
-           @keyframes victoryFadeOut {
-               from { opacity: 1; transform: scale(1); }
-               to { opacity: 0; transform: scale(0.8); }
-           }
-       `;
-   }
+    switch(roomNum) {
+        case 1: return [1, 2, 3, 4];
+        case 2: return [5, 6, 7, 8];
+        case 3: return [9, 10, 11, 12];
+        default: return [];
+    }
 }
 
 // 축하 효과 생성
 function createCelebrationEffect() {
-   for (let i = 0; i < 50; i++) {
-       createConfetti();
-   }
+    for (let i = 0; i < 50; i++) {
+        createConfetti();
+    }
    
-   confettiInterval = setInterval(() => {
-       for (let i = 0; i < 10; i++) {
-           createConfetti();
-       }
-   }, 200);
+    confettiInterval = setInterval(() => {
+        for (let i = 0; i < 10; i++) {
+            createConfetti();
+        }
+    }, 200);
 }
 
 // 색종이 개별 생성
 function createConfetti() {
-   const confetti = document.createElement('div');
-   const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
-   const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    const confetti = document.createElement('div');
+    const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
    
-   confetti.style.cssText = `
-       position: fixed;
-       width: 10px;
-       height: 10px;
-       background: ${randomColor};
-       top: -10px;
-       left: ${Math.random() * 100}vw;
-       z-index: 9999;
-       border-radius: 2px;
-       pointer-events: none;
-       animation: confettiFall ${2 + Math.random() * 3}s linear forwards;
-   `;
+    confetti.style.cssText = `
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: ${randomColor};
+        top: -10px;
+        left: ${Math.random() * 100}vw;
+        z-index: 9999;
+        border-radius: 2px;
+        pointer-events: none;
+        animation: confettiFall ${2 + Math.random() * 3}s linear forwards;
+    `;
    
-   document.body.appendChild(confetti);
+    document.body.appendChild(confetti);
    
-   if (!document.querySelector('#confettiAnimation')) {
-       const style = document.createElement('style');
-       style.id = 'confettiAnimation';
-       style.textContent = `
-           @keyframes confettiFall {
-               to {
-                   transform: translateY(100vh) rotate(360deg);
-                   opacity: 0;
-               }
-           }
-       `;
-       document.head.appendChild(style);
-   }
+    if (!document.querySelector('#confettiAnimation')) {
+        const style = document.createElement('style');
+        style.id = 'confettiAnimation';
+        style.textContent = `
+            @keyframes confettiFall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
    
-   setTimeout(() => {
-       if (confetti.parentNode) {
-           confetti.parentNode.removeChild(confetti);
-       }
-   }, 5000);
+    setTimeout(() => {
+        if (confetti.parentNode) {
+            confetti.parentNode.removeChild(confetti);
+        }
+    }, 5000);
 }
 
-// 다음 방으로 이동 (텍스트 없이)
+// 다음 방으로 이동
 function nextRoom() {
     const nextRoomNum = currentRoom + 1;
     stopRoomTimer();
@@ -1674,7 +1545,7 @@ function nextRoom() {
     const videoKey = `room${currentRoom}`;
     showTransitionWithVideo(videoKey, () => {
         document.getElementById(`room${currentRoom}`).classList.add('exit-left');
-        
+       
         setTimeout(() => {
             currentRoom = nextRoomNum;
             localStorage.setItem('currentRoom', currentRoom);
@@ -1685,49 +1556,47 @@ function nextRoom() {
     });
 }
 
-
 // 방 표시
 function showRoom(roomNum, showStory = true) {
-   for (let i = 1; i <= 3; i++) {
-       const room = document.getElementById(`room${i}`);
-       room.style.display = 'none';
-       room.classList.remove('active', 'exit-left');
-   }
+    for (let i = 1; i <= 3; i++) {
+        const room = document.getElementById(`room${i}`);
+        room.style.display = 'none';
+        room.classList.remove('active', 'exit-left');
+    }
    
-   const currentRoomElement = document.getElementById(`room${roomNum}`);
-   currentRoomElement.style.display = 'block';
+    const currentRoomElement = document.getElementById(`room${roomNum}`);
+    currentRoomElement.style.display = 'block';
    
-   setTimeout(() => {
-       currentRoomElement.classList.add('active');
-       if (showStory) {
-           showStoryModal(roomNum);
-       } else {
+    setTimeout(() => {
+        currentRoomElement.classList.add('active');
+        if (showStory) {
+            showStoryModal(roomNum);
+        } else {
             startRoomTimer();
-       }
-   }, 100);
+        }
+    }, 100);
 }
 
 // UI 업데이트
 function updateUI() {
-   const totalCompleted = completedQuizzes.length;
-   const roomNames = {
-       1: "ROOM 1",
-       2: "ROOM 2", 
-       3: "ROOM 3"
-   };
+    const totalCompleted = completedQuizzes.length;
+    const roomNames = {
+        1: "ROOM 1",
+        2: "ROOM 2", 
+        3: "ROOM 3"
+    };
    
-   document.getElementById('progress').textContent = `${totalCompleted}/12 완료`;
-   document.getElementById('roomInfo').textContent = roomNames[currentRoom] || `방 ${currentRoom}`;
-   updateQuizObjectsState(); // ✨ 퀴즈 상태 업데이트 함수 호출
+    document.getElementById('progress').textContent = `${totalCompleted}/12 완료`;
+    document.getElementById('roomInfo').textContent = roomNames[currentRoom] || `방 ${currentRoom}`;
+    updateQuizObjectsState();
 }
 
-// ✨ 퀴즈 오브젝트 상태 업데이트 함수
+// 퀴즈 오브젝트 상태 업데이트
 function updateQuizObjectsState() {
     const lastCompletedQuiz = completedQuizzes.length > 0 ? Math.max(...completedQuizzes) : 0;
     const nextQuizId = lastCompletedQuiz + 1;
 
     document.querySelectorAll('.clickable').forEach(element => {
-        // book 오브젝트는 별도 처리
         if (element.classList.contains('book')) {
             const requiredQuizzes = [5, 6, 7];
             const allCompleted = requiredQuizzes.every(id => completedQuizzes.includes(id));
@@ -1747,14 +1616,11 @@ function updateQuizObjectsState() {
         
         const quizId = parseInt(onclickAttr.match(/\d+/)[0]);
 
-        // 모든 효과 초기화
         element.classList.remove('locked', 'next-quiz');
 
         if (quizId > nextQuizId) {
-            // 아직 풀 수 없는 퀴즈
             element.classList.add('locked');
         } else if (quizId === nextQuizId) {
-            // 다음에 풀어야 할 퀴즈
             if (nextQuizId <= 12) {
                 element.classList.add('next-quiz');
             }
@@ -1764,8 +1630,8 @@ function updateQuizObjectsState() {
 
 // 모달 닫기
 function closeModal() {
-   document.getElementById('quizModal').style.display = 'none';
-   currentQuiz = null;
+    document.getElementById('quizModal').style.display = 'none';
+    currentQuiz = null;
 }
 
 // 스토리 모달 표시
@@ -1788,7 +1654,6 @@ function closeStoryModal() {
 function openHint() {
     playClickSound();
     
-    // 5, 6, 7번 퀴즈 완료 확인
     const requiredQuizzes = [5, 6, 7];
     const allCompleted = requiredQuizzes.every(id => completedQuizzes.includes(id));
     
@@ -1797,7 +1662,6 @@ function openHint() {
         return;
     }
     
-    // 힌트 표시
     document.getElementById('hintContent').textContent = "ㄱ ㄱ ㅅ ㅇ   ㄴ ㅇ ㄴ   ㅍ ㅅ ㅇ   ㅈ ㄹ ㄴ   ㅁ ㄱ ?";
     document.getElementById('hintModal').style.display = 'flex';
 }
@@ -1807,7 +1671,7 @@ function closeHintModal() {
     document.getElementById('hintModal').style.display = 'none';
 }
 
-// 완성된 퍼즐 보여주기 (새로운 함수 - 전체 추가)
+// 완성된 퍼즐 보여주기
 function showCompletedPuzzle() {
     const puzzleSource = document.getElementById('puzzleSource');
     const puzzleTarget = document.getElementById('puzzleTarget');
@@ -1816,7 +1680,6 @@ function showCompletedPuzzle() {
     puzzleSource.innerHTML = '';
     puzzleTarget.innerHTML = '';
     
-    // 🆕 완성된 퍼즐 스타일 강력하게 적용
     puzzleTarget.classList.add('completed');
     puzzleTarget.style.cssText = `
         background: transparent !important;
@@ -1824,7 +1687,6 @@ function showCompletedPuzzle() {
         gap: 0 !important;
     `;
     
-    // 🆕 퍼즐 그리드 스타일 적용
     if (puzzleGrid) {
         puzzleGrid.classList.add('completed');
         puzzleGrid.style.cssText = `
@@ -1835,7 +1697,6 @@ function showCompletedPuzzle() {
         `;
     }
     
-    // 안내 메시지 추가
     const completedMessage = document.createElement('div');
     completedMessage.style.cssText = `
         color: #4caf50;
@@ -1847,13 +1708,11 @@ function showCompletedPuzzle() {
     completedMessage.textContent = '✓ 완성된 퍼즐';
     puzzleSource.appendChild(completedMessage);
     
-    // 완성된 퍼즐을 오른쪽에 표시
     for (let i = 0; i < 25; i++) {
         const slot = document.createElement('div');
         slot.className = 'puzzle-slot completed';
         slot.dataset.targetIndex = i;
         
-        // 🆕 슬롯 스타일 직접 적용
         slot.style.cssText = `
             background: transparent !important;
             border: none !important;
@@ -1861,7 +1720,6 @@ function showCompletedPuzzle() {
         `;
         
         const piece = createPuzzlePiece(i, i, false);
-        // 🆕 조각 스타일 직접 적용
         piece.style.cssText += `
             border: none !important;
             box-shadow: none !important;
@@ -1879,7 +1737,6 @@ function showCompletedPuzzle() {
 function openPuzzleHint() {
     playClickSound();
     
-    // 9, 10, 11번 퀴즈 완료 확인
     const requiredQuizzes = [9, 10, 11];
     const allCompleted = requiredQuizzes.every(id => completedQuizzes.includes(id));
     
@@ -1888,14 +1745,12 @@ function openPuzzleHint() {
         return;
     }
     
-    // 🆕 이미 퍼즐을 완성했다면 완성된 퍼즐 보여주기
     if (puzzleCompleted || localStorage.getItem('puzzleCompleted') === 'true') {
-        puzzleCompleted = true;  // 🆕 추가
-        showCompletedPuzzle();   // 🆕 함수명 변경
+        puzzleCompleted = true;
+        showCompletedPuzzle();
         return;
     }
     
-    // 퍼즐 게임 표시
     initializePuzzle();
     document.getElementById('puzzleModal').style.display = 'flex';
 }
@@ -1907,22 +1762,18 @@ function initializePuzzle() {
     puzzleSource.innerHTML = '';
     puzzleTarget.innerHTML = '';
     
-    // 25개의 퍼즐 조각 생성 (0-24)
     puzzlePieces = Array.from({length: 25}, (_, i) => i);
     
-    // 무작위로 섞기
     for (let i = puzzlePieces.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [puzzlePieces[i], puzzlePieces[j]] = [puzzlePieces[j], puzzlePieces[i]];
     }
     
-    // 왼쪽: 섞인 퍼즐 조각들 생성
     puzzlePieces.forEach((pieceIndex, position) => {
         const piece = createPuzzlePiece(pieceIndex, position, true);
         puzzleSource.appendChild(piece);
     });
     
-    // 오른쪽: 빈 슬롯 25개 생성
     for (let i = 0; i < 25; i++) {
         const slot = document.createElement('div');
         slot.className = 'puzzle-slot';
@@ -2080,7 +1931,7 @@ function handlePuzzleTouchEnd(e) {
     puzzleInitialParent = null;
 }
 
-// 퍼즐 완성 확인 (새 버전)
+// 퍼즐 완성 확인
 function checkPuzzleCompletion() {
     const slots = document.querySelectorAll('#puzzleTarget .puzzle-slot');
     let correctCount = 0;
@@ -2109,9 +1960,8 @@ function checkPuzzleCompletion() {
         localStorage.setItem('puzzleCompleted', 'true');
         
         const puzzleTarget = document.getElementById('puzzleTarget');
-        const puzzleGrid = puzzleTarget.parentElement; // 퍼즐 그리드 요소 가져오기
+        const puzzleGrid = puzzleTarget.parentElement;
         
-        // 🆕 퍼즐 타겟 스타일 제거
         puzzleTarget.classList.add('completed');
         puzzleTarget.style.cssText = `
             background: transparent !important;
@@ -2119,7 +1969,6 @@ function checkPuzzleCompletion() {
             gap: 0 !important;
         `;
         
-        // 🆕 퍼즐 그리드 스타일 제거
         if (puzzleGrid) {
             puzzleGrid.classList.add('completed');
             puzzleGrid.style.cssText = `
@@ -2130,7 +1979,6 @@ function checkPuzzleCompletion() {
             `;
         }
         
-        // 🆕 각 슬롯과 조각의 테두리 제거
         slots.forEach(slot => {
             slot.classList.add('completed');
             slot.style.cssText = `
@@ -2224,176 +2072,176 @@ function closePuzzleModal() {
 
 // 메시지 표시
 function showMessage(text) {
-   const message = document.createElement('div');
-   message.className = 'message';
-   message.textContent = text;
-   document.body.appendChild(message);
+    const message = document.createElement('div');
+    message.className = 'message';
+    message.textContent = text;
+    document.body.appendChild(message);
    
-   setTimeout(() => {
-       if (message.parentNode) {
-           message.parentNode.removeChild(message);
-       }
-   }, 1500);
+    setTimeout(() => {
+        if (message.parentNode) {
+            message.parentNode.removeChild(message);
+        }
+    }, 1500);
 }
 
-// 게임 재시작 - 부드러운 전환 추가
+// 게임 재시작
 function restartGame() {
-   stopRoomTimer();
-   stopBackgroundMusic();
+    stopRoomTimer();
+    stopBackgroundMusic();
    
-   if (confettiInterval) {
-       clearInterval(confettiInterval);
-       confettiInterval = null;
-   }
+    if (confettiInterval) {
+        clearInterval(confettiInterval);
+        confettiInterval = null;
+    }
    
-   const confettis = document.querySelectorAll('div[style*="confettiFall"]');
-   confettis.forEach(confetti => {
-       if (confetti.parentNode) {
-           confetti.parentNode.removeChild(confetti);
-       }
-   });
+    const confettis = document.querySelectorAll('div[style*="confettiFall"]');
+    confettis.forEach(confetti => {
+        if (confetti.parentNode) {
+            confetti.parentNode.removeChild(confetti);
+        }
+    });
    
-   currentRoom = 1;
-   completedQuizzes = [];
-   currentQuiz = null;
-   timeLeft = 600;
-   isTimerActive = false;
+    currentRoom = 1;
+    completedQuizzes = [];
+    currentQuiz = null;
+    timeLeft = 600;
+    isTimerActive = false;
    
-   localStorage.removeItem('completedQuizzes');
-   localStorage.removeItem('currentRoom');
-   localStorage.removeItem('gameCompleted');
-   localStorage.removeItem('puzzleCompleted');
-   puzzleCompleted = false;
+    localStorage.removeItem('completedQuizzes');
+    localStorage.removeItem('currentRoom');
+    localStorage.removeItem('gameCompleted');
+    localStorage.removeItem('puzzleCompleted');
+    puzzleCompleted = false;
     
-   document.querySelectorAll('.clickable').forEach(element => {
-       element.classList.remove('completed', 'locked', 'next-quiz'); // ✨ 클래스 초기화
-       element.style.animation = '';
-   });
+    document.querySelectorAll('.clickable').forEach(element => {
+        element.classList.remove('completed', 'locked', 'next-quiz');
+        element.style.animation = '';
+    });
    
-   document.getElementById('endingScreen').classList.remove('active');
-   document.getElementById('gameScreen').classList.remove('active');
-   document.getElementById('gameOverScreen').classList.remove('active');
-   document.getElementById('gameOverScreen').style.display = 'none';
+    document.getElementById('endingScreen').classList.remove('active');
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('gameOverScreen').classList.remove('active');
+    document.getElementById('gameOverScreen').style.display = 'none';
    
-   document.getElementById('endingScreen').style.transition = 'opacity 1s ease-out';
-   document.getElementById('endingScreen').style.opacity = '0';
+    document.getElementById('endingScreen').style.transition = 'opacity 1s ease-out';
+    document.getElementById('endingScreen').style.opacity = '0';
    
-   setTimeout(() => {
-       document.getElementById('endingScreen').style.display = 'none';
-       document.getElementById('endingScreen').style.transition = '';
-       document.getElementById('endingScreen').style.opacity = '';
-       document.getElementById('endingScreen').style.transform = '';
+    setTimeout(() => {
+        document.getElementById('endingScreen').style.display = 'none';
+        document.getElementById('endingScreen').style.transition = '';
+        document.getElementById('endingScreen').style.opacity = '';
+        document.getElementById('endingScreen').style.transform = '';
        
-       document.getElementById('startScreen').style.display = 'flex';
-       document.getElementById('startScreen').classList.remove('fade-out');
-       document.getElementById('nextRoomBtn').style.display = 'none';
+        document.getElementById('startScreen').style.display = 'flex';
+        document.getElementById('startScreen').classList.remove('fade-out');
+        document.getElementById('nextRoomBtn').style.display = 'none';
        
-       hideTimerWarning();
-       showRoom(1, false);
-       updateUI();
-   }, 1000);
+        hideTimerWarning();
+        showRoom(1, false);
+        updateUI();
+    }, 1000);
 }
 
-// 비디오 포함 전환 효과 - 텍스트 제거
+// 비디오 포함 전환 효과
 function showTransitionWithVideo(videoKey, callback) {
-   const transition = document.getElementById('screenTransition');
-   const video = document.getElementById('transitionVideo');
-   video.muted = false;
-   transition.classList.add('active');
+    const transition = document.getElementById('screenTransition');
+    const video = document.getElementById('transitionVideo');
+    video.muted = false;
+    transition.classList.add('active');
    
-   const videoSrc = transitionVideos[videoKey];
-   let videoLoaded = false;
-   let callbackExecuted = false;
+    const videoSrc = transitionVideos[videoKey];
+    let videoLoaded = false;
+    let callbackExecuted = false;
    
-   if (videoSrc) {
-       video.removeEventListener('loadeddata', handleVideoLoad);
-       video.removeEventListener('ended', handleVideoEnd);
-       video.removeEventListener('error', handleVideoError);
+    if (videoSrc) {
+        video.removeEventListener('loadeddata', handleVideoLoad);
+        video.removeEventListener('ended', handleVideoEnd);
+        video.removeEventListener('error', handleVideoError);
        
-       video.src = videoSrc;
+        video.src = videoSrc;
        
-       function handleVideoLoad() {
-           videoLoaded = true;
-           video.play().catch(e => {
-               console.log('비디오 자동재생 실패, 기본 전환으로 진행:', e);
-               executeCallback();
-           });
-       }
+        function handleVideoLoad() {
+            videoLoaded = true;
+            video.play().catch(e => {
+                console.log('비디오 자동재생 실패, 기본 전환으로 진행:', e);
+                executeCallback();
+            });
+        }
        
-       function handleVideoEnd() {
-           executeCallback();
-       }
+        function handleVideoEnd() {
+            executeCallback();
+        }
        
-       function handleVideoError() {
-           console.log('비디오 로드 실패, 기본 전환으로 진행');
-           executeCallback();
-       }
+        function handleVideoError() {
+            console.log('비디오 로드 실패, 기본 전환으로 진행');
+            executeCallback();
+        }
        
-       function executeCallback() {
-           if (callbackExecuted) return;
-           callbackExecuted = true;
+        function executeCallback() {
+            if (callbackExecuted) return;
+            callbackExecuted = true;
            
-           if (callback) callback();
+            if (callback) callback();
            
-           setTimeout(() => {
-               transition.classList.remove('active');
-               video.src = '';
-               video.removeEventListener('loadeddata', handleVideoLoad);
-               video.removeEventListener('ended', handleVideoEnd);
-               video.removeEventListener('error', handleVideoError);
-           }, 300);
-       }
+            setTimeout(() => {
+                transition.classList.remove('active');
+                video.src = '';
+                video.removeEventListener('loadeddata', handleVideoLoad);
+                video.removeEventListener('ended', handleVideoEnd);
+                video.removeEventListener('error', handleVideoError);
+            }, 300);
+        }
        
-       video.addEventListener('loadeddata', handleVideoLoad, { once: true });
-       video.addEventListener('ended', handleVideoEnd, { once: true });
-       video.addEventListener('error', handleVideoError, { once: true });
+        video.addEventListener('loadeddata', handleVideoLoad, { once: true });
+        video.addEventListener('ended', handleVideoEnd, { once: true });
+        video.addEventListener('error', handleVideoError, { once: true });
        
-       video.load();
+        video.load();
        
-       setTimeout(() => {
-           if (!videoLoaded && !callbackExecuted) {
-               console.log('비디오 로드 시간 초과, 기본 전환으로 진행');
-               executeCallback();
-           }
-       }, 3000);
+        setTimeout(() => {
+            if (!videoLoaded && !callbackExecuted) {
+                console.log('비디오 로드 시간 초과, 기본 전환으로 진행');
+                executeCallback();
+            }
+        }, 3000);
        
-   } else {
-       console.log('비디오 파일 없음, 기본 전환 효과 사용');
-       setTimeout(() => {
-           if (callback) callback();
-           setTimeout(() => {
-               transition.classList.remove('active');
-           }, 500);
-       }, 1500);
-   }
+    } else {
+        console.log('비디오 파일 없음, 기본 전환 효과 사용');
+        setTimeout(() => {
+            if (callback) callback();
+            setTimeout(() => {
+                transition.classList.remove('active');
+            }, 500);
+        }, 1500);
+    }
    
-   setTimeout(() => {
-       if (!callbackExecuted) {
-           console.log('최대 대기 시간 초과, 강제 진행');
-           if (callback) callback();
-           setTimeout(() => {
-               transition.classList.remove('active');
-               video.src = '';
-           }, 500);
-       }
-   }, 7000);
+    setTimeout(() => {
+        if (!callbackExecuted) {
+            console.log('최대 대기 시간 초과, 강제 진행');
+            if (callback) callback();
+            setTimeout(() => {
+                transition.classList.remove('active');
+                video.src = '';
+            }, 500);
+        }
+    }, 7000);
 }
 
 // 키보드 이벤트 처리
 document.addEventListener('keydown', function(e) {
-   if (e.key === 'Escape') {
-       closeModal();
-   }
+    if (e.key === 'Escape') {
+        closeModal();
+    }
 });
 
 // 모달 외부 클릭 시 닫기
 document.getElementById('quizModal').addEventListener('click', function(e) {
-   if (e.target === this) {
-       closeModal();
-   }
+    if (e.target === this) {
+        closeModal();
+    }
 });
 
-// 페이지 로드 시 초기화 (사운드 초기화 추가 및 전체 화면 요청)
+// 페이지 로드 시 초기화
 window.addEventListener('load', function() {
     initializeSounds();
  
@@ -2416,12 +2264,11 @@ window.addEventListener('load', function() {
             document.getElementById('startScreen').style.display = 'flex';
         }
     }
- });
-
-
-
-
-
-
-
-
+    
+    // 갤럭시탭 최적화: 화면 회전 방지
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(() => {
+            console.log('화면 회전 잠금 지원 안됨');
+        });
+    }
+});
