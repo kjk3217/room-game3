@@ -61,11 +61,10 @@ body {
     height: 100%;
     background-size: cover;
     background-position: center;
-    position: absolute; /* ✨ absolute로 변경 */
+    position: absolute;
     top: 0;
     left: 0;
     opacity: 0;
-    /* ✨ 애니메이션 성능 향상 */
     transform: translateX(100px);
     transition: opacity 0.8s, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, opacity;
@@ -104,7 +103,7 @@ body {
 }
 
 .game-logo {
-    max-width: 40rem; /* ✨ rem 단위로 변경 */
+    max-width: 40rem;
     width: 70%;
     height: auto;
     margin-bottom: 1rem;
@@ -118,12 +117,12 @@ body {
 }
 
 .start-btn {
-    padding: 1.2rem 2.5rem; /* ✨ rem 단위로 변경 */
-    font-size: 2.5rem; /* ✨ rem 단위로 변경 */
+    padding: 1.2rem 2.5rem;
+    font-size: 2.5rem;
     background: linear-gradient(45deg, #8e24aa, #3f51b5);
     color: white;
     border: none;
-    border-radius: 2rem; /* ✨ rem 단위로 변경 */
+    border-radius: 2rem;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -134,7 +133,6 @@ body {
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
-/* === ✨ 태블릿 최적화를 위한 수정/추가 ✨ === */
 /* 게임 화면 */
 .game-screen {
     display: none;
@@ -144,7 +142,6 @@ body {
     opacity: 0;
     transform: translateY(50px);
     transition: all 0.8s ease;
-    /* ✨ 중앙 정렬을 위해 추가 */
     justify-content: center;
     align-items: center;
 }
@@ -152,20 +149,19 @@ body {
 .game-screen.active {
     opacity: 1;
     transform: translateY(0);
-    display: flex; /* ✨ flex로 변경 */
+    display: flex;
 }
 
 /* 화면 비율 유지를 위한 래퍼 */
 .game-wrapper {
     width: 100%;
-    max-width: 160vh; /* 16:10 비율 (height * 1.6) */
+    max-width: 160vh;
     height: 100vh;
-    max-height: 62.5vw; /* 16:10 비율 (width * 0.625) */
+    max-height: 62.5vw;
     position: relative;
     overflow: hidden;
     box-shadow: 0 0 40px rgba(0,0,0,0.5);
 }
-/* ========================================= */
 
 /* 상단 UI */
 .top-ui {
@@ -179,7 +175,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.5rem; /* ✨ rem 단위로 변경 */
+    font-size: 1.5rem;
 }
 
 .progress, .room-info {
@@ -247,50 +243,44 @@ body {
     position: absolute;
     cursor: pointer;
     transition: all 0.3s ease;
-    /* ✨ 시각적 피드백을 위해 투명 테두리 추가 */
     border: 3px solid transparent;
     border-radius: 10px;
-    background: rgba(255, 255, 0, 0); /* 투명 배경 */
+    background: rgba(255, 255, 0, 0);
 }
 
-/* === ✨ 반짝이는 효과 수정 ✨ === */
-/* 마우스 올렸을 때 애니메이션 제거 -> 충돌 방지 */
 .clickable:hover {
     transform: scale(1.05);
 }
-/* ======================================= */
-
 
 .clickable.completed {
     border-color: transparent;
     animation: none;
     transform: none;
-    cursor: default; /* 완료 시 커서 변경 */
+    cursor: default;
 }
 .clickable.completed:hover {
-    border-color: transparent; /* 완료 시 호버 효과 제거 */
+    border-color: transparent;
 }
 
 .clickable.completed::after {
     content: '✓';
     position: absolute;
-    top: 50%; /* ✨ 중앙으로 이동 */
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 255, 0, 0.8);
     color: #000;
-    width: 3rem; /* ✨ rem 단위로 변경 */
+    width: 3rem;
     height: 3rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1.8rem; /* ✨ rem 단위로 변경 */
+    font-size: 1.8rem;
     box-shadow: 0 2px 8px rgba(0,255,0,0.3);
 }
 
-/* === ✨ 순차적 활성화 스타일 추가 ✨ === */
 .clickable.locked {
     filter: grayscale(100%);
     cursor: not-allowed;
@@ -301,7 +291,6 @@ body {
     border-color: transparent;
 }
 
-/* === ✨ 반짝이는 효과 수정 ✨ === */
 .clickable.next-quiz {
     animation: nextQuizGlow 1.5s ease-in-out infinite;
 }
@@ -316,9 +305,7 @@ body {
         transform: scale(1.03);
     }
 }
-/* ======================================= */
 
-/* === ✨ 태블릿 비율에 맞게 위치 재조정 (단위: %) ✨ === */
 /* 방1 오브젝트 위치 */
 .tree { top: 28%; left: 6%; width: 8%; height: 45%; }
 .jar { top: 48%; left: 44%; width: 7%; height: 15%; }
@@ -338,7 +325,6 @@ body {
 .cross { top: 22%; left: 13%; width: 5%; height: 40%; }
 .pillar { top: 58%; right: 8%; width: 6%; height: 28%; }
 .door3 { top: 18%; right: 26%; width: 10%; height: 40%; }
-/* ======================================================= */
 
 /* 모달 */
 .modal {
@@ -352,19 +338,19 @@ body {
     z-index: 1000;
     justify-content: center;
     align-items: center;
-    padding: 1rem; /* ✨ 패딩 추가 */
+    padding: 1rem;
 }
 
 .modal-content {
     background: linear-gradient(135deg, #4a148c, #1a237e);
-    padding: 2.5rem; /* ✨ rem 단위로 변경 */
+    padding: 2.5rem;
     border-radius: 1.2rem;
     max-width: 90vw;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6);
     animation: modalSlide 0.3s ease-out;
-    width: 100%; /* ✨ 너비 100%로 설정 */
+    width: 100%;
 }
 @keyframes modalSlide { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -442,14 +428,12 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* === ✨ 터치 피드백 강화 ✨ === */
 .word-element.dragging {
     opacity: 0.6;
-    transform: scale(1.1) rotate(5deg); /* 드래그 시 살짝 커지고 회전 */
+    transform: scale(1.1) rotate(5deg);
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
 
-/* === ✨ 터치 드래그앤 드롭 성능 개선을 위한 스타일 (추가) ✨ === */
 .word-element.touch-dragging {
     position: fixed;
     pointer-events: none;
@@ -472,7 +456,7 @@ body {
     cursor: pointer; display: none;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 200; /* ✨ 다른 요소 위에 보이도록 z-index 추가 */
+    z-index: 200;
 }
 
 /* 엔딩/게임오버 화면 */
@@ -621,10 +605,12 @@ body {
     50% { transform: translateX(10px); opacity: 1; }
 }
 
-/* 퍼즐 그리드 */
+/* 퍼즐 그리드 - FLEX로 변경 */
 .puzzle-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
     gap: 2px;
     width: min(40vh, 40vw);
     height: min(40vh, 40vw);
@@ -639,7 +625,11 @@ body {
     border: 2px dashed #4caf50;
 }
 
+/* 퍼즐 조각 - 고정 크기 */
 .puzzle-piece {
+    width: calc((min(40vh, 40vw) - 14px) / 5);
+    height: calc((min(40vh, 40vw) - 14px) / 5);
+    flex-shrink: 0;
     aspect-ratio: 1;
     background-size: 500% 500%;
     background-repeat: no-repeat;
@@ -647,7 +637,7 @@ body {
     transition: all 0.2s ease;
     border: 2px solid rgba(255,255,255,0.3);
     position: relative;
-    touch-action: none; /* 터치 최적화 */
+    touch-action: none;
 }
 
 .puzzle-piece:active {
@@ -677,8 +667,11 @@ body {
     transition: none;
 }
 
-/* 빈 칸 스타일 */
+/* 빈 칸 스타일 - 고정 크기 */
 .puzzle-slot {
+    width: calc((min(40vh, 40vw) - 14px) / 5);
+    height: calc((min(40vh, 40vw) - 14px) / 5);
+    flex-shrink: 0;
     aspect-ratio: 1;
     background: rgba(255,255,255,0.05);
     border: 2px dashed rgba(255,255,255,0.3);
@@ -724,7 +717,7 @@ body {
     to { opacity: 0; }
 }
 
-/* 반응형 디자인은 root font-size와 %단위로 대체되어 단순화 */
+/* 반응형 디자인 */
 @media (max-width: 768px) {
     :root { font-size: clamp(10px, 1.5vw, 14px); }
     .top-ui { flex-direction: column; gap: 0.5rem; }
@@ -743,5 +736,16 @@ body {
     .puzzle-grid {
         width: min(60vw, 60vh);
         height: min(60vw, 60vh);
+    }
+    
+    /* 모바일에서도 고정 크기 유지 */
+    .puzzle-piece {
+        width: calc((min(60vw, 60vh) - 14px) / 5);
+        height: calc((min(60vw, 60vh) - 14px) / 5);
+    }
+    
+    .puzzle-slot {
+        width: calc((min(60vw, 60vh) - 14px) / 5);
+        height: calc((min(60vw, 60vh) - 14px) / 5);
     }
 }
