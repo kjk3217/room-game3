@@ -1807,7 +1807,46 @@ function closeHintModal() {
     document.getElementById('hintModal').style.display = 'none';
 }
 
-// 퍼즐 힌트 열기
+// 완성된 퍼즐 보여주기 (새로운 함수 - 전체 추가)
+function showCompletedPuzzle() {
+    const puzzleSource = document.getElementById('puzzleSource');
+    const puzzleTarget = document.getElementById('puzzleTarget');
+    puzzleSource.innerHTML = '';
+    puzzleTarget.innerHTML = '';
+    
+    // 완성된 퍼즐 스타일 적용
+    puzzleTarget.classList.add('completed');
+    
+    // 안내 메시지 추가
+    const completedMessage = document.createElement('div');
+    completedMessage.style.cssText = `
+        color: #4caf50;
+        font-size: 1.5rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        font-weight: bold;
+    `;
+    completedMessage.textContent = '✓ 완성된 퍼즐';
+    puzzleSource.appendChild(completedMessage);
+    
+    // 완성된 퍼즐을 오른쪽에 표시
+    for (let i = 0; i < 25; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'puzzle-slot completed';
+        slot.dataset.targetIndex = i;
+        
+        const piece = createPuzzlePiece(i, i, false);
+        piece.style.border = 'none';
+        piece.draggable = false;
+        piece.style.cursor = 'default';
+        
+        slot.appendChild(piece);
+        puzzleTarget.appendChild(slot);
+    }
+    
+    document.getElementById('puzzleModal').style.display = 'flex';
+}
+
 function openPuzzleHint() {
     playClickSound();
     
@@ -1820,9 +1859,10 @@ function openPuzzleHint() {
         return;
     }
     
-    // 이미 퍼즐을 완성했다면 힌트만 바로 표시
+    // 🆕 이미 퍼즐을 완성했다면 완성된 퍼즐 보여주기
     if (puzzleCompleted || localStorage.getItem('puzzleCompleted') === 'true') {
-        showPuzzleHintMessage();
+        puzzleCompleted = true;  // 🆕 추가
+        showCompletedPuzzle();   // 🆕 함수명 변경
         return;
     }
     
@@ -2040,6 +2080,20 @@ function checkPuzzleCompletion() {
         localStorage.setItem('puzzleCompleted', 'true');
         
         const puzzleTarget = document.getElementById('puzzleTarget');
+        
+        // 🆕 퍼즐 완성 시 테두리 제거 (이 3줄 추가)
+        puzzleTarget.classList.add('completed');
+        puzzleTarget.style.gap = '0';
+        
+        // 🆕 각 슬롯과 조각의 테두리 제거 (이 부분 추가)
+        slots.forEach(slot => {
+            slot.classList.add('completed');
+            const piece = slot.querySelector('.puzzle-piece');
+            if (piece) {
+                piece.style.border = 'none';
+            }
+        });
+        
         puzzleTarget.style.animation = 'puzzleComplete 1s ease';
         
         setTimeout(() => {
@@ -2309,6 +2363,7 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
 
