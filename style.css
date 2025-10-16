@@ -328,7 +328,7 @@ body {
 .box { top: 67%; right: 15%; width: 9%; height: 12%; }
 .mask { top: 39%; left: 59%; width: 7%; height: 15%; }
 .book { top: 35%; left: 17%; width: 7%; height: 13%; }
-.door2 { top: 20%; left: 6%; width: 8%; height: 30%; }
+.door2 { top: 18%; left: 6%; width: 8%; height: 34%; }
 
 /* 방3 오브젝트 위치 */
 .bible { top: 35%; right: 10%; width: 9%; height: 11%; }
@@ -954,6 +954,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
