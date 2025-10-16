@@ -306,6 +306,17 @@ body {
     animation: nextQuizGlow 1.5s ease-in-out infinite;
 }
 
+/* 책은 반짝임 효과 제외 */
+.book.next-quiz {
+    animation: none;
+    box-shadow: none;
+    transform: none;
+}
+
+.book.next-quiz:hover {
+    transform: scale(1.08);
+}
+
 @keyframes nextQuizGlow {
     0%, 100% {
         box-shadow: none;
@@ -954,6 +965,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
