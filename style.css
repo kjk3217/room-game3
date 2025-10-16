@@ -325,7 +325,7 @@ body {
 
 /* 방2 오브젝트 위치 */
 .hourglass { top: 72%; left: 42%; width: 6%; height: 20%; }
-.box { top: 58%; right: 11%; width: 10%; height: 12%; }
+.box { top: 61%; right: 15%; width: 10%; height: 12%; }
 .mask { top: 41%; left: 58%; width: 7%; height: 14%; }
 .book { top: 45%; left: 8%; width: 8%; height: 12%; }
 .door2 { top: 20%; left: 7%; width: 7%; height: 26%; }
@@ -954,6 +954,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
