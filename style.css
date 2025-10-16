@@ -319,8 +319,8 @@ body {
 
 /* 방1 오브젝트 위치 */
 .tree { top: 28%; left: 6%; width: 8%; height: 45%; }
-.jar { top: 48%; left: 44%; width: 7%; height: 15%; }
-.candle { top: 65%; right: 9%; width: 4%; height: 10%; }
+.jar { top: 50%; left: 42%; width: 8%; height: 17%; }
+.candle { top: 65%; right: 9%; width: 5%; height: 14%; }
 .door1 { top: 22%; right: 15%; width: 12%; height: 40%; }
 
 /* 방2 오브젝트 위치 */
@@ -954,3 +954,4 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
