@@ -1811,11 +1811,29 @@ function closeHintModal() {
 function showCompletedPuzzle() {
     const puzzleSource = document.getElementById('puzzleSource');
     const puzzleTarget = document.getElementById('puzzleTarget');
+    const puzzleGrid = puzzleTarget.parentElement;
+    
     puzzleSource.innerHTML = '';
     puzzleTarget.innerHTML = '';
     
-    // 완성된 퍼즐 스타일 적용
+    // 🆕 완성된 퍼즐 스타일 강력하게 적용
     puzzleTarget.classList.add('completed');
+    puzzleTarget.style.cssText = `
+        background: transparent !important;
+        border: none !important;
+        gap: 0 !important;
+    `;
+    
+    // 🆕 퍼즐 그리드 스타일 적용
+    if (puzzleGrid) {
+        puzzleGrid.classList.add('completed');
+        puzzleGrid.style.cssText = `
+            background: transparent !important;
+            padding: 0 !important;
+            gap: 0 !important;
+            box-shadow: 0 10px 30px rgba(255,215,0,0.3) !important;
+        `;
+    }
     
     // 안내 메시지 추가
     const completedMessage = document.createElement('div');
@@ -1835,8 +1853,19 @@ function showCompletedPuzzle() {
         slot.className = 'puzzle-slot completed';
         slot.dataset.targetIndex = i;
         
+        // 🆕 슬롯 스타일 직접 적용
+        slot.style.cssText = `
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+        `;
+        
         const piece = createPuzzlePiece(i, i, false);
-        piece.style.border = 'none';
+        // 🆕 조각 스타일 직접 적용
+        piece.style.cssText += `
+            border: none !important;
+            box-shadow: none !important;
+        `;
         piece.draggable = false;
         piece.style.cursor = 'default';
         
@@ -2080,17 +2109,42 @@ function checkPuzzleCompletion() {
         localStorage.setItem('puzzleCompleted', 'true');
         
         const puzzleTarget = document.getElementById('puzzleTarget');
+        const puzzleGrid = puzzleTarget.parentElement; // 퍼즐 그리드 요소 가져오기
         
-        // 🆕 퍼즐 완성 시 테두리 제거 (이 3줄 추가)
+        // 🆕 퍼즐 타겟 스타일 제거
         puzzleTarget.classList.add('completed');
-        puzzleTarget.style.gap = '0';
+        puzzleTarget.style.cssText = `
+            background: transparent !important;
+            border: none !important;
+            gap: 0 !important;
+        `;
         
-        // 🆕 각 슬롯과 조각의 테두리 제거 (이 부분 추가)
+        // 🆕 퍼즐 그리드 스타일 제거
+        if (puzzleGrid) {
+            puzzleGrid.classList.add('completed');
+            puzzleGrid.style.cssText = `
+                background: transparent !important;
+                padding: 0 !important;
+                gap: 0 !important;
+                box-shadow: 0 10px 30px rgba(255,215,0,0.3) !important;
+            `;
+        }
+        
+        // 🆕 각 슬롯과 조각의 테두리 제거
         slots.forEach(slot => {
             slot.classList.add('completed');
+            slot.style.cssText = `
+                background: transparent !important;
+                border: none !important;
+                border-radius: 0 !important;
+            `;
+            
             const piece = slot.querySelector('.puzzle-piece');
             if (piece) {
-                piece.style.border = 'none';
+                piece.style.cssText += `
+                    border: none !important;
+                    box-shadow: none !important;
+                `;
             }
         });
         
@@ -2363,6 +2417,7 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
 
