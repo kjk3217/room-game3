@@ -177,12 +177,12 @@ body {
     left: 0;
     right: 0;
     background: rgba(0,0,0,0.8);
-    padding: 1.5rem;
+    padding: 0.8rem 1.5rem;  /* 위아래 패딩 줄임 */
     z-index: 100;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1.8rem;
+    font-size: 1.6rem;  /* 폰트 크기도 약간 줄임 */
 }
 
 .progress, .room-info {
@@ -199,17 +199,17 @@ body {
 }
 
 .timer {
-    font-size: 2rem;
+    font-size: 1.8rem;  /* 폰트 크기 줄임 */
     font-weight: bold;
     color: #00ff00;
     background: rgba(0,0,0,0.8);
-    padding: 0.8rem 1.5rem;
+    padding: 0.6rem 1.2rem;  /* 패딩 줄임 */
     border-radius: 0.8rem;
-    border: 3px solid #00ff00;
+    border: 2px solid #00ff00;  /* 테두리 두께 줄임 */
     text-shadow: 0 0 10px rgba(0,255,0,0.8);
     transition: all 0.3s ease;
     font-family: 'Courier New', monospace;
-    min-width: 120px;
+    min-width: 110px;
 }
 
 .timer.warning {
@@ -965,6 +965,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
