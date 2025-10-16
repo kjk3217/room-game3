@@ -1758,6 +1758,29 @@ function closeStoryModal() {
     startRoomTimer();
 }
 
+// 힌트 열기
+function openHint() {
+    playClickSound();
+    
+    // 5, 6, 7번 퀴즈 완료 확인
+    const requiredQuizzes = [5, 6, 7];
+    const allCompleted = requiredQuizzes.every(id => completedQuizzes.includes(id));
+    
+    if (!allCompleted) {
+        showMessage("이전 퀴즈를 먼저 풀어주세요!");
+        return;
+    }
+    
+    // 힌트 표시
+    document.getElementById('hintContent').textContent = "ㄱ ㄱ ㅅ ㅇ   ㄴ ㅇ ㄴ   ㅍ ㅅ ㅇ   ㅈ ㄹ ㄴ   ㅁ ㄱ ?";
+    document.getElementById('hintModal').style.display = 'flex';
+}
+
+// 힌트 모달 닫기
+function closeHintModal() {
+    document.getElementById('hintModal').style.display = 'none';
+}
+
 // 메시지 표시
 function showMessage(text) {
    const message = document.createElement('div');
@@ -1951,4 +1974,5 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
