@@ -17,6 +17,11 @@ let clickSound = null;
 let soundsLoaded = false;
 let confettiInterval = null;
 
+// 퍼즐 관련 변수
+let puzzlePieces = [];
+let selectedPiece = null;
+let puzzleCompleted = false;
+
 // 전환 비디오 설정 (엔딩 비디오 제거)
 const transitionVideos = {
     start: 'videos/start_to_room1.mp4',      // 시작 → 방1
@@ -1799,6 +1804,209 @@ function closeHintModal() {
     document.getElementById('hintModal').style.display = 'none';
 }
 
+// 퍼즐 힌트 열기
+function openPuzzleHint() {
+    playClickSound();
+    
+    // 9, 10, 11번 퀴즈 완료 확인
+    const requiredQuizzes = [9, 10, 11];
+    const allCompleted = requiredQuizzes.every(id => completedQuizzes.includes(id));
+    
+    if (!allCompleted) {
+        showMessage("이전 퀴즈를 먼저 풀어주세요!");
+        return;
+    }
+    
+    // 이미 퍼즐을 완성했다면 힌트만 바로 표시
+    if (puzzleCompleted || localStorage.getItem('puzzleCompleted') === 'true') {
+        showPuzzleHintMessage();
+        return;
+    }
+    
+    // 퍼즐 게임 표시
+    initializePuzzle();
+    document.getElementById('puzzleModal').style.display = 'flex';
+}
+
+// 퍼즐 초기화
+function initializePuzzle() {
+    const puzzleGame = document.getElementById('puzzleGame');
+    puzzleGame.innerHTML = '';
+    
+    // 25개의 퍼즐 조각 생성 (0-24)
+    puzzlePieces = Array.from({length: 25}, (_, i) => i);
+    
+    // 무작위로 섞기
+    for (let i = puzzlePieces.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [puzzlePieces[i], puzzlePieces[j]] = [puzzlePieces[j], puzzlePieces[i]];
+    }
+    
+    // 퍼즐 조각 생성
+    puzzlePieces.forEach((pieceIndex, position) => {
+        const piece = document.createElement('div');
+        piece.className = 'puzzle-piece';
+        piece.dataset.position = position;
+        piece.dataset.correctIndex = pieceIndex;
+        
+        // 배경 이미지 위치 계산 (5x5 그리드)
+        const row = Math.floor(pieceIndex / 5);
+        const col = pieceIndex % 5;
+        
+        piece.style.backgroundImage = 'url("images/puzzle.png")';
+        piece.style.backgroundPosition = `${col * 25}% ${row * 25}%`;
+        
+        piece.addEventListener('click', () => selectPuzzlePiece(piece));
+        
+        puzzleGame.appendChild(piece);
+    });
+}
+
+// 퍼즐 조각 선택 및 교환
+function selectPuzzlePiece(piece) {
+    if (!selectedPiece) {
+        // 첫 번째 조각 선택
+        selectedPiece = piece;
+        piece.classList.add('selected');
+        playClickSound();
+    } else if (selectedPiece === piece) {
+        // 같은 조각 클릭 시 선택 해제
+        selectedPiece.classList.remove('selected');
+        selectedPiece = null;
+    } else {
+        // 두 번째 조각 선택 - 교환
+        playClickSound();
+        swapPuzzlePieces(selectedPiece, piece);
+        selectedPiece.classList.remove('selected');
+        selectedPiece = null;
+    }
+}
+
+// 퍼즐 조각 교환
+function swapPuzzlePieces(piece1, piece2) {
+    const pos1 = parseInt(piece1.dataset.position);
+    const pos2 = parseInt(piece2.dataset.position);
+    
+    // 위치 데이터 교환
+    piece1.dataset.position = pos2;
+    piece2.dataset.position = pos1;
+    
+    // 배열에서도 교환
+    [puzzlePieces[pos1], puzzlePieces[pos2]] = [puzzlePieces[pos2], puzzlePieces[pos1]];
+    
+    // DOM 위치 교환
+    const parent = piece1.parentNode;
+    const next1 = piece1.nextSibling;
+    const next2 = piece2.nextSibling;
+    
+    if (next1 === piece2) {
+        parent.insertBefore(piece2, piece1);
+    } else if (next2 === piece1) {
+        parent.insertBefore(piece1, piece2);
+    } else {
+        parent.insertBefore(piece1, next2);
+        parent.insertBefore(piece2, next1);
+    }
+    
+    // 완성 여부 확인
+    checkPuzzleCompletion();
+}
+
+// 퍼즐 완성 확인
+function checkPuzzleCompletion() {
+    let isComplete = true;
+    
+    document.querySelectorAll('.puzzle-piece').forEach((piece) => {
+        const position = parseInt(piece.dataset.position);
+        const correctIndex = parseInt(piece.dataset.correctIndex);
+        
+        if (position === correctIndex) {
+            piece.classList.add('correct');
+        } else {
+            piece.classList.remove('correct');
+            isComplete = false;
+        }
+    });
+    
+    if (isComplete) {
+        puzzleCompleted = true;
+        localStorage.setItem('puzzleCompleted', 'true');
+        
+        // 완성 효과
+        const puzzleGrid = document.getElementById('puzzleGame');
+        puzzleGrid.style.animation = 'puzzleComplete 1s ease';
+        
+        setTimeout(() => {
+            closePuzzleModal();
+            showPuzzleHintMessage();
+        }, 1500);
+    }
+}
+
+// 퍼즐 힌트 메시지 표시
+function showPuzzleHintMessage() {
+    const hintMessage = document.createElement('div');
+    hintMessage.className = 'puzzle-hint-message';
+    hintMessage.innerHTML = `
+        <div class="hint-message-content">
+            <h3>🎉 퍼즐 완성! 🎉</h3>
+            <p style="font-size: 1.6rem; line-height: 1.8; margin: 1.5rem 0;">
+                마지막 문을 열기 위한 <span style="color: #ffd700; font-weight: bold;">힌트</span>를 발견했습니다!
+            </p>
+            <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 10px; margin: 1rem 0;">
+                <p style="font-size: 1.4rem; color: #87ceeb;">
+                    "말의 뜻을 구별해 주는<br>가장 작은 소리의 단위"
+                </p>
+            </div>
+            <button class="challenge-btn" onclick="closeHintMessage()" style="margin-top: 1rem; padding: 1rem 2rem; font-size: 1.4rem;">확인</button>
+        </div>
+    `;
+    
+    hintMessage.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 5000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.5s ease;
+    `;
+    
+    const content = hintMessage.querySelector('.hint-message-content');
+    content.style.cssText = `
+        background: linear-gradient(135deg, #1a237e, #4a148c);
+        padding: 2.5rem;
+        border-radius: 20px;
+        text-align: center;
+        color: white;
+        max-width: 90%;
+        box-shadow: 0 0 50px rgba(255,215,0,0.6);
+    `;
+    
+    document.body.appendChild(hintMessage);
+}
+
+// 힌트 메시지 닫기
+function closeHintMessage() {
+    const hintMessage = document.querySelector('.puzzle-hint-message');
+    if (hintMessage) {
+        hintMessage.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => {
+            hintMessage.remove();
+        }, 300);
+    }
+}
+
+// 퍼즐 모달 닫기
+function closePuzzleModal() {
+    document.getElementById('puzzleModal').style.display = 'none';
+    selectedPiece = null;
+}
+
 // 메시지 표시
 function showMessage(text) {
    const message = document.createElement('div');
@@ -1839,7 +2047,9 @@ function restartGame() {
    localStorage.removeItem('completedQuizzes');
    localStorage.removeItem('currentRoom');
    localStorage.removeItem('gameCompleted');
-   
+   localStorage.removeItem('puzzleCompleted');
+   puzzleCompleted = false;
+    
    document.querySelectorAll('.clickable').forEach(element => {
        element.classList.remove('completed', 'locked', 'next-quiz'); // ✨ 클래스 초기화
        element.style.animation = '';
@@ -1992,6 +2202,7 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
 
