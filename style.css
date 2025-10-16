@@ -612,8 +612,8 @@ body {
     justify-content: center;
     align-content: flex-start;
     gap: 2px;
-    width: min(40vh, 40vw);
-    height: min(40vh, 40vw);
+    width: min(50vh, 50vw);
+    height: min(50vh, 50vw);
     background: rgba(0,0,0,0.5);
     padding: 2px;
     border-radius: 8px;
@@ -631,8 +631,8 @@ body {
 
 /* 퍼즐 조각 - 동적 크기 */
 .puzzle-piece {
-    width: calc((min(40vh, 40vw) - 14px) / 5);
-    height: calc((min(40vh, 40vw) - 14px) / 5);
+    width: calc((min(50vh, 50vw) - 14px) / 5);
+    height: calc((min(50vh, 50vw) - 14px) / 5);
     aspect-ratio: 1;
     background-size: 500% 500%;
     background-repeat: no-repeat;
@@ -745,14 +745,14 @@ body {
     }
     
     .puzzle-grid {
-        width: min(60vw, 60vh);
-        height: min(60vw, 60vh);
+        width: min(70vw, 70vh);
+        height: min(70vw, 70vh);
     }
     
     /* 모바일에서 조각 크기 조정 */
     .puzzle-piece {
-        width: calc((min(60vw, 60vh) - 14px) / 5);
-        height: calc((min(60vw, 60vh) - 14px) / 5);
+        width: calc((min(70vw, 70vh) - 14px) / 5);
+        height: calc((min(70vw, 70vh) - 14px) / 5);
     }
     
     /* 타겟 그리드 안의 조각은 Grid 셀에 맞춤 */
@@ -761,3 +761,4 @@ body {
         height: 100%;
     }
 }
+
