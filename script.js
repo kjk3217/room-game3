@@ -83,8 +83,8 @@ const quizzes = {
     },
     8: {
         title: "두 번째 방 탈출",
-        question: "두 번째 방을 탈출하기 위한 <span class='highlight-red'>비밀번호</span>. (힌트: 울림소리)",
-        answers: ["130"],
+        question: "두 번째 방을 탈출하기 위한 <span class='highlight-red'>비밀번호</span>.",
+        answers: ["40"],
         type: "password"
     },
     9: {
@@ -1662,7 +1662,7 @@ function openHint() {
         return;
     }
     
-    document.getElementById('hintContent').textContent = "ㄱ ㄱ ㅅ ㅇ   ㄴ ㅇ ㄴ   ㅍ ㅅ ㅇ   ㅈ ㄹ ㄴ   ㅁ ㄱ ?";
+    document.getElementById('hintContent').textContent = "ㅈㅇ+ㅁㅇ?";
     document.getElementById('hintModal').style.display = 'flex';
 }
 
@@ -2272,3 +2272,4 @@ window.addEventListener('load', function() {
         });
     }
 });
+
