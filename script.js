@@ -19,8 +19,11 @@ let confettiInterval = null;
 
 // 퍼즐 관련 변수
 let puzzlePieces = [];
-let selectedPiece = null;
 let puzzleCompleted = false;
+let puzzleTouchElement = null;
+let puzzleTouchOffsetX = 0;
+let puzzleTouchOffsetY = 0;
+let puzzleInitialParent = null;
 
 // 전환 비디오 설정 (엔딩 비디오 제거)
 const transitionVideos = {
@@ -1830,8 +1833,10 @@ function openPuzzleHint() {
 
 // 퍼즐 초기화
 function initializePuzzle() {
-    const puzzleGame = document.getElementById('puzzleGame');
-    puzzleGame.innerHTML = '';
+    const puzzleSource = document.getElementById('puzzleSource');
+    const puzzleTarget = document.getElementById('puzzleTarget');
+    puzzleSource.innerHTML = '';
+    puzzleTarget.innerHTML = '';
     
     // 25개의 퍼즐 조각 생성 (0-24)
     puzzlePieces = Array.from({length: 25}, (_, i) => i);
@@ -1842,99 +1847,200 @@ function initializePuzzle() {
         [puzzlePieces[i], puzzlePieces[j]] = [puzzlePieces[j], puzzlePieces[i]];
     }
     
-    // 퍼즐 조각 생성
+    // 왼쪽: 섞인 퍼즐 조각들 생성
     puzzlePieces.forEach((pieceIndex, position) => {
-        const piece = document.createElement('div');
-        piece.className = 'puzzle-piece';
-        piece.dataset.position = position;
-        piece.dataset.correctIndex = pieceIndex;
-        
-        // 배경 이미지 위치 계산 (5x5 그리드)
-        const row = Math.floor(pieceIndex / 5);
-        const col = pieceIndex % 5;
-        
-        piece.style.backgroundImage = 'url("images/puzzle.png")';
-        piece.style.backgroundPosition = `${col * 25}% ${row * 25}%`;
-        
-        piece.addEventListener('click', () => selectPuzzlePiece(piece));
-        
-        puzzleGame.appendChild(piece);
+        const piece = createPuzzlePiece(pieceIndex, position, true);
+        puzzleSource.appendChild(piece);
     });
-}
-
-// 퍼즐 조각 선택 및 교환
-function selectPuzzlePiece(piece) {
-    if (!selectedPiece) {
-        // 첫 번째 조각 선택
-        selectedPiece = piece;
-        piece.classList.add('selected');
-        playClickSound();
-    } else if (selectedPiece === piece) {
-        // 같은 조각 클릭 시 선택 해제
-        selectedPiece.classList.remove('selected');
-        selectedPiece = null;
-    } else {
-        // 두 번째 조각 선택 - 교환
-        playClickSound();
-        swapPuzzlePieces(selectedPiece, piece);
-        selectedPiece.classList.remove('selected');
-        selectedPiece = null;
-    }
-}
-
-// 퍼즐 조각 교환
-function swapPuzzlePieces(piece1, piece2) {
-    const pos1 = parseInt(piece1.dataset.position);
-    const pos2 = parseInt(piece2.dataset.position);
     
-    // 위치 데이터 교환
-    piece1.dataset.position = pos2;
-    piece2.dataset.position = pos1;
-    
-    // 배열에서도 교환
-    [puzzlePieces[pos1], puzzlePieces[pos2]] = [puzzlePieces[pos2], puzzlePieces[pos1]];
-    
-    // DOM 위치 교환
-    const parent = piece1.parentNode;
-    const next1 = piece1.nextSibling;
-    const next2 = piece2.nextSibling;
-    
-    if (next1 === piece2) {
-        parent.insertBefore(piece2, piece1);
-    } else if (next2 === piece1) {
-        parent.insertBefore(piece1, piece2);
-    } else {
-        parent.insertBefore(piece1, next2);
-        parent.insertBefore(piece2, next1);
-    }
-    
-    // 완성 여부 확인
-    checkPuzzleCompletion();
-}
-
-// 퍼즐 완성 확인
-function checkPuzzleCompletion() {
-    let isComplete = true;
-    
-    document.querySelectorAll('.puzzle-piece').forEach((piece) => {
-        const position = parseInt(piece.dataset.position);
-        const correctIndex = parseInt(piece.dataset.correctIndex);
+    // 오른쪽: 빈 슬롯 25개 생성
+    for (let i = 0; i < 25; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'puzzle-slot';
+        slot.dataset.targetIndex = i;
         
-        if (position === correctIndex) {
-            piece.classList.add('correct');
+        slot.addEventListener('dragover', handlePuzzleDragOver);
+        slot.addEventListener('drop', handlePuzzleDrop);
+        slot.addEventListener('dragleave', handlePuzzleDragLeave);
+        
+        puzzleTarget.appendChild(slot);
+    }
+}
+
+// 퍼즐 조각 생성
+function createPuzzlePiece(pieceIndex, position, isSource) {
+    const piece = document.createElement('div');
+    piece.className = 'puzzle-piece';
+    if (isSource) piece.classList.add('from-source');
+    piece.dataset.pieceIndex = pieceIndex;
+    piece.dataset.position = position;
+    piece.draggable = true;
+    
+    const row = Math.floor(pieceIndex / 5);
+    const col = pieceIndex % 5;
+    
+    piece.style.backgroundImage = 'url("images/puzzle.png")';
+    piece.style.backgroundPosition = `${col * 25}% ${row * 25}%`;
+    
+    piece.addEventListener('dragstart', handlePuzzleDragStart);
+    piece.addEventListener('dragend', handlePuzzleDragEnd);
+    piece.addEventListener('touchstart', handlePuzzleTouchStart, { passive: false });
+    piece.addEventListener('touchmove', handlePuzzleTouchMove, { passive: false });
+    piece.addEventListener('touchend', handlePuzzleTouchEnd, { passive: false });
+    
+    return piece;
+}
+
+// 퍼즐 드래그 시작
+function handlePuzzleDragStart(e) {
+    e.target.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', e.target.dataset.pieceIndex);
+}
+
+// 퍼즐 드래그 종료
+function handlePuzzleDragEnd(e) {
+    e.target.classList.remove('dragging');
+}
+
+// 퍼즐 드래그 오버
+function handlePuzzleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    if (e.currentTarget.classList.contains('puzzle-slot') && 
+        !e.currentTarget.querySelector('.puzzle-piece')) {
+        e.currentTarget.classList.add('drop-highlight');
+    }
+}
+
+// 퍼즐 드래그 떠남
+function handlePuzzleDragLeave(e) {
+    e.currentTarget.classList.remove('drop-highlight');
+}
+
+// 퍼즐 드롭
+function handlePuzzleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drop-highlight');
+    
+    const pieceIndex = e.dataTransfer.getData('text/plain');
+    const draggedPiece = document.querySelector(`[data-piece-index="${pieceIndex}"]`);
+    
+    if (e.currentTarget.classList.contains('puzzle-slot') && 
+        !e.currentTarget.querySelector('.puzzle-piece') &&
+        draggedPiece) {
+        
+        e.currentTarget.appendChild(draggedPiece);
+        e.currentTarget.classList.add('filled');
+        draggedPiece.classList.remove('from-source');
+        
+        playClickSound();
+        checkPuzzleCompletion();
+    }
+}
+
+// 퍼즐 터치 시작
+function handlePuzzleTouchStart(e) {
+    e.preventDefault();
+    puzzleTouchElement = e.target;
+    puzzleInitialParent = e.target.parentElement;
+    
+    const touch = e.touches[0];
+    const rect = e.target.getBoundingClientRect();
+    
+    puzzleTouchOffsetX = touch.clientX - rect.left;
+    puzzleTouchOffsetY = touch.clientY - rect.top;
+    
+    puzzleTouchElement.classList.add('touch-dragging');
+    puzzleTouchElement.style.left = `${rect.left}px`;
+    puzzleTouchElement.style.top = `${rect.top}px`;
+    puzzleTouchElement.style.width = `${rect.width}px`;
+    puzzleTouchElement.style.height = `${rect.height}px`;
+    
+    document.body.style.overflow = 'hidden';
+}
+
+// 퍼즐 터치 이동
+function handlePuzzleTouchMove(e) {
+    e.preventDefault();
+    if (!puzzleTouchElement) return;
+    
+    const touch = e.touches[0];
+    const x = touch.clientX - puzzleTouchOffsetX;
+    const y = touch.clientY - puzzleTouchOffsetY;
+    
+    puzzleTouchElement.style.left = `${x}px`;
+    puzzleTouchElement.style.top = `${y}px`;
+}
+
+// 퍼즐 터치 종료
+function handlePuzzleTouchEnd(e) {
+    e.preventDefault();
+    if (!puzzleTouchElement) return;
+    
+    const touch = e.changedTouches[0];
+    
+    puzzleTouchElement.style.display = 'none';
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    puzzleTouchElement.style.display = '';
+    
+    const targetSlot = elementBelow?.closest('.puzzle-slot');
+    
+    puzzleTouchElement.classList.remove('touch-dragging');
+    puzzleTouchElement.style.left = '';
+    puzzleTouchElement.style.top = '';
+    puzzleTouchElement.style.width = '';
+    puzzleTouchElement.style.height = '';
+    document.body.style.overflow = '';
+    
+    if (targetSlot && !targetSlot.querySelector('.puzzle-piece')) {
+        targetSlot.appendChild(puzzleTouchElement);
+        targetSlot.classList.add('filled');
+        puzzleTouchElement.classList.remove('from-source');
+        
+        playClickSound();
+        checkPuzzleCompletion();
+    } else {
+        if (puzzleInitialParent) {
+            puzzleInitialParent.appendChild(puzzleTouchElement);
+        }
+    }
+    
+    puzzleTouchElement = null;
+    puzzleInitialParent = null;
+}
+
+// 퍼즐 완성 확인 (새 버전)
+function checkPuzzleCompletion() {
+    const slots = document.querySelectorAll('#puzzleTarget .puzzle-slot');
+    let correctCount = 0;
+    let allFilled = true;
+    
+    slots.forEach((slot) => {
+        const piece = slot.querySelector('.puzzle-piece');
+        const targetIndex = parseInt(slot.dataset.targetIndex);
+        
+        slot.classList.remove('correct');
+        
+        if (piece) {
+            const pieceIndex = parseInt(piece.dataset.pieceIndex);
+            
+            if (pieceIndex === targetIndex) {
+                slot.classList.add('correct');
+                correctCount++;
+            }
         } else {
-            piece.classList.remove('correct');
-            isComplete = false;
+            allFilled = false;
         }
     });
     
-    if (isComplete) {
+    if (allFilled && correctCount === 25) {
         puzzleCompleted = true;
         localStorage.setItem('puzzleCompleted', 'true');
         
-        // 완성 효과
-        const puzzleGrid = document.getElementById('puzzleGame');
-        puzzleGrid.style.animation = 'puzzleComplete 1s ease';
+        const puzzleTarget = document.getElementById('puzzleTarget');
+        puzzleTarget.style.animation = 'puzzleComplete 1s ease';
         
         setTimeout(() => {
             closePuzzleModal();
@@ -2004,7 +2110,8 @@ function closeHintMessage() {
 // 퍼즐 모달 닫기
 function closePuzzleModal() {
     document.getElementById('puzzleModal').style.display = 'none';
-    selectedPiece = null;
+    puzzleTouchElement = null;
+    puzzleInitialParent = null;
 }
 
 // 메시지 표시
@@ -2202,6 +2309,7 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
 
