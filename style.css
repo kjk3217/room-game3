@@ -329,6 +329,7 @@ body {
 .hourglass { top: 75%; left: 43%; width: 4%; height: 16%; }
 .box { top: 62%; right: 14%; width: 13%; height: 18%; }
 .mask { top: 41%; left: 58%; width: 7%; height: 14%; }
+.book { top: 45%; left: 8%; width: 8%; height: 12%; }
 .door2 { top: 20%; left: 7%; width: 7%; height: 26%; }
 
 /* 방3 오브젝트 위치 */
@@ -575,3 +576,4 @@ body {
     background: linear-gradient(45deg, #ff9800, #f57c00);
     color: white;
 }
+
