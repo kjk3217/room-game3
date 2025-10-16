@@ -1713,13 +1713,31 @@ function updateUI() {
    updateQuizObjectsState(); // ✨ 퀴즈 상태 업데이트 함수 호출
 }
 
-// ✨ 퀴즈 오브젝트 상태 업데이트 함수 (새로 추가)
+// ✨ 퀴즈 오브젝트 상태 업데이트 함수
 function updateQuizObjectsState() {
     const lastCompletedQuiz = completedQuizzes.length > 0 ? Math.max(...completedQuizzes) : 0;
     const nextQuizId = lastCompletedQuiz + 1;
 
     document.querySelectorAll('.clickable').forEach(element => {
-        const quizId = parseInt(element.getAttribute('onclick').match(/\d+/)[0]);
+        // book 오브젝트는 별도 처리
+        if (element.classList.contains('book')) {
+            const requiredQuizzes = [5, 6, 7];
+            const allCompleted = requiredQuizzes.every(id => completedQuizzes.includes(id));
+            
+            element.classList.remove('locked', 'next-quiz');
+            
+            if (!allCompleted) {
+                element.classList.add('locked');
+            } else if (!completedQuizzes.includes(8)) {
+                element.classList.add('next-quiz');
+            }
+            return;
+        }
+        
+        const onclickAttr = element.getAttribute('onclick');
+        if (!onclickAttr || !onclickAttr.includes('openQuiz')) return;
+        
+        const quizId = parseInt(onclickAttr.match(/\d+/)[0]);
 
         // 모든 효과 초기화
         element.classList.remove('locked', 'next-quiz');
@@ -1729,7 +1747,7 @@ function updateQuizObjectsState() {
             element.classList.add('locked');
         } else if (quizId === nextQuizId) {
             // 다음에 풀어야 할 퀴즈
-            if (nextQuizId <= 12) { // 12번 퀴즈까지만 반짝임
+            if (nextQuizId <= 12) {
                 element.classList.add('next-quiz');
             }
         }
@@ -1974,5 +1992,6 @@ window.addEventListener('load', function() {
         }
     }
  });
+
 
 
