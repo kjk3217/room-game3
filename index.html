@@ -45,10 +45,11 @@
                 </div>
 
                 <div class="room room2" id="room2">
-                    <div class="clickable hourglass" onclick="openQuiz(5)"></div>
-                    <div class="clickable box" onclick="openQuiz(6)"></div>
-                    <div class="clickable mask" onclick="openQuiz(7)"></div>
-                    <div class="clickable door2" onclick="openQuiz(8)"></div>
+                     <div class="clickable hourglass" onclick="openQuiz(5)"></div>
+                     <div class="clickable box" onclick="openQuiz(6)"></div>
+                     <div class="clickable mask" onclick="openQuiz(7)"></div>
+                     <div class="clickable book" onclick="openHint()"></div>
+                     <div class="clickable door2" onclick="openQuiz(8)"></div>
                 </div>
 
                 <div class="room room3" id="room3">
@@ -100,6 +101,17 @@
         </div>
     </div>
 
+    <div class="modal hint-modal" id="hintModal">
+    <div class="modal-content">
+        <h3>📖 보이는 자는 나갈것이다</h3>
+        <p id="hintContent" style="font-size: 2.5rem; letter-spacing: 0.5rem; text-align: center; color: #ffd700;"></p>
+        <div class="modal-buttons">
+            <button class="close-btn" onclick="closeHintModal()">확인</button>
+        </div>
+    </div>
+</div>
+    
     <script src="script.js"></script>
 </body>
 </html>
+
