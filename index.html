@@ -115,8 +115,18 @@
     <div class="modal puzzle-modal" id="puzzleModal">
     <div class="modal-content puzzle-content">
         <h3>🧩 그림 맞추기 퍼즐</h3>
-        <p>조각을 클릭하여 교환하고 완성된 그림을 맞춰보세요!</p>
-        <div id="puzzleGame" class="puzzle-grid"></div>
+        <p>왼쪽 조각을 오른쪽 빈 칸으로 옮겨서 완성하세요!</p>
+        <div class="puzzle-container">
+            <div class="puzzle-side">
+                <h4>조각 상자</h4>
+                <div id="puzzleSource" class="puzzle-grid"></div>
+            </div>
+            <div class="puzzle-arrow">➜</div>
+            <div class="puzzle-side">
+                <h4>완성할 그림</h4>
+                <div id="puzzleTarget" class="puzzle-grid puzzle-target"></div>
+            </div>
+        </div>
         <div class="modal-buttons">
             <button class="close-btn" onclick="closePuzzleModal()">닫기</button>
         </div>
@@ -126,5 +136,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
