@@ -67,7 +67,7 @@ const quizzes = {
         }
     },
     5: {
-        title: "체언의 종류",
+        title: "음운의 종류",
         question: "다음 빈칸에 들어갈 알맞은 음운을 순서대로 채우세요.\n\n1. 초성: 파열음이면서 예사소리이고 입술소리인 음운\n2. 중성: 후설모음이면서 평순모음이고 저모음인 음운\n3. 종성: 비음이면서 입술소리의 음운\n4. 위 세 음운을 묶어 알맞은 단어를 쓰시오.",
         answers: ["ㅂ", "ㅏ", "ㅁ", "밤"],
         type: "four"
@@ -155,4 +155,5 @@ function getRoomQuizzes(roomNum) {
         case 3: return [9, 10, 11, 12];
         default: return [];
     }
+
 }
