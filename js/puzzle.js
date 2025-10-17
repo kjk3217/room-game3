@@ -168,6 +168,7 @@ function handlePuzzleDragLeave(e) {
     e.currentTarget.classList.remove('drop-highlight');
 }
 
+// 퍼즐 드롭 이벤트 수정
 function handlePuzzleDrop(e) {
     e.preventDefault();
     e.currentTarget.classList.remove('drop-highlight');
@@ -175,16 +176,39 @@ function handlePuzzleDrop(e) {
     const pieceIndex = e.dataTransfer.getData('text/plain');
     const draggedPiece = document.querySelector(`[data-piece-index="${pieceIndex}"]`);
     
-    if (e.currentTarget.classList.contains('puzzle-slot') && 
-        !e.currentTarget.querySelector('.puzzle-piece') &&
-        draggedPiece) {
+    if (e.currentTarget.classList.contains('puzzle-slot') && draggedPiece) {
+        const existingPiece = e.currentTarget.querySelector('.puzzle-piece');
         
-        e.currentTarget.appendChild(draggedPiece);
-        e.currentTarget.classList.add('filled');
-        draggedPiece.classList.remove('from-source');
-        
-        playClickSound();
-        checkPuzzleCompletion();
+        if (existingPiece) {
+            // 이미 조각이 있는 경우 - 서로 위치 교환
+            const draggedParent = draggedPiece.parentElement;
+            
+            // 임시로 조각들을 저장
+            const tempContainer = document.createElement('div');
+            tempContainer.appendChild(draggedPiece);
+            
+            // 기존 조각을 드래그한 조각이 있던 위치로 이동
+            draggedParent.appendChild(existingPiece);
+            draggedParent.classList.add('filled');
+            
+            // 드래그한 조각을 타겟 위치로 이동
+            e.currentTarget.appendChild(tempContainer.firstChild);
+            e.currentTarget.classList.add('filled');
+            
+            existingPiece.classList.remove('from-source');
+            draggedPiece.classList.remove('from-source');
+            
+            playClickSound();
+            checkPuzzleCompletion();
+        } else {
+            // 빈 칸인 경우 - 기존 로직
+            e.currentTarget.appendChild(draggedPiece);
+            e.currentTarget.classList.add('filled');
+            draggedPiece.classList.remove('from-source');
+            
+            playClickSound();
+            checkPuzzleCompletion();
+        }
     }
 }
 
@@ -221,6 +245,7 @@ function handlePuzzleTouchMove(e) {
     puzzleTouchElement.style.top = `${y}px`;
 }
 
+// 퍼즐 터치 종료 이벤트 수정
 function handlePuzzleTouchEnd(e) {
     e.preventDefault();
     if (!puzzleTouchElement) return;
@@ -240,14 +265,48 @@ function handlePuzzleTouchEnd(e) {
     puzzleTouchElement.style.height = '';
     document.body.style.overflow = '';
     
-    if (targetSlot && !targetSlot.querySelector('.puzzle-piece')) {
-        targetSlot.appendChild(puzzleTouchElement);
-        targetSlot.classList.add('filled');
-        puzzleTouchElement.classList.remove('from-source');
+    if (targetSlot) {
+        const existingPiece = targetSlot.querySelector('.puzzle-piece');
         
-        playClickSound();
-        checkPuzzleCompletion();
+        if (existingPiece && existingPiece !== puzzleTouchElement) {
+            // 이미 조각이 있는 경우 - 서로 위치 교환
+            const draggedParent = puzzleInitialParent;
+            
+            // 임시로 조각들을 저장
+            const tempContainer = document.createElement('div');
+            tempContainer.appendChild(puzzleTouchElement);
+            
+            // 기존 조각을 드래그한 조각이 있던 위치로 이동
+            if (draggedParent) {
+                draggedParent.appendChild(existingPiece);
+                draggedParent.classList.add('filled');
+            }
+            
+            // 드래그한 조각을 타겟 위치로 이동
+            targetSlot.appendChild(tempContainer.firstChild);
+            targetSlot.classList.add('filled');
+            
+            existingPiece.classList.remove('from-source');
+            puzzleTouchElement.classList.remove('from-source');
+            
+            playClickSound();
+            checkPuzzleCompletion();
+        } else if (!existingPiece) {
+            // 빈 칸인 경우 - 기존 로직
+            targetSlot.appendChild(puzzleTouchElement);
+            targetSlot.classList.add('filled');
+            puzzleTouchElement.classList.remove('from-source');
+            
+            playClickSound();
+            checkPuzzleCompletion();
+        } else {
+            // 자기 자신에게 드롭한 경우
+            if (puzzleInitialParent) {
+                puzzleInitialParent.appendChild(puzzleTouchElement);
+            }
+        }
     } else {
+        // 유효하지 않은 위치에 드롭한 경우 원래 위치로
         if (puzzleInitialParent) {
             puzzleInitialParent.appendChild(puzzleTouchElement);
         }
@@ -394,4 +453,5 @@ function closePuzzleModal() {
     document.getElementById('puzzleModal').style.display = 'none';
     puzzleTouchElement = null;
     puzzleInitialParent = null;
+
 }
