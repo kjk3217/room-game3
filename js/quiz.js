@@ -463,9 +463,9 @@ function createWordClassificationGame() {
     instructionText.style.cssText = `
         text-align: center;
         color: #ffd700;
-        font-size: 0.8rem;
+        font-size: 1.4rem;
         width: 100%;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
     `;
     unclassifiedContainer.appendChild(instructionText);
 
@@ -1020,4 +1020,5 @@ function handleTouchEnd(e) {
     draggedTouchElement = null;
 
 }
+
 
