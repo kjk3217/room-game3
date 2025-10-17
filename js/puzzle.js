@@ -383,10 +383,6 @@ function checkPuzzleCompletion() {
         
         puzzleTarget.style.animation = 'puzzleComplete 1s ease';
         
-        setTimeout(() => {
-            closePuzzleModal();
-            showPuzzleHintMessage();
-        }, 1500);
     }
 }
 
@@ -455,3 +451,4 @@ function closePuzzleModal() {
     puzzleInitialParent = null;
 
 }
+
