@@ -463,7 +463,7 @@ function createWordClassificationGame() {
     instructionText.style.cssText = `
         text-align: center;
         color: #ffd700;
-        font-size: 1.2rem;
+        font-size: 1.0rem;
         width: 100%;
         margin-bottom: 15px;
     `;
@@ -1018,4 +1018,5 @@ function handleTouchEnd(e) {
     }
 
     draggedTouchElement = null;
+
 }
