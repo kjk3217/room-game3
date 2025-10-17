@@ -466,13 +466,13 @@ body {
 
 .word-element {
     background: linear-gradient(135deg, #4a90e2, #357abd);
-    color: white; padding: 1.2rem 1.8rem;
+    color: white; padding: 1.0rem 1.5rem;
     border-radius: 0.8rem; cursor: grab;
     user-select: none; font-weight: bold;
-    font-size: 1.8rem; transition: all 0.3s ease;
+    font-size: 1.6rem; transition: all 0.3s ease;
     box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-    min-width: 80px;
-    min-height: 60px;
+    min-width: 70px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -974,6 +974,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
