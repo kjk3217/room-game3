@@ -447,8 +447,8 @@ body {
 }
 .answer-words-container,
 .category-drop-zone {
-    flex: 1; min-height: 12rem;
-    padding: 1.2rem; background: rgba(0,100,0,0.2);
+    flex: 1; min-height: 8rem;
+    padding: 1.0rem; background: rgba(0,100,0,0.2);
     border-radius: 1rem; border: 2px dashed #4caf50;
     display: flex; flex-wrap: wrap;
     align-content: flex-start; justify-content: center;
@@ -974,6 +974,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
