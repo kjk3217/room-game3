@@ -454,6 +454,15 @@ body {
     align-content: flex-start; justify-content: center;
     gap: 0.8rem;
 }
+/* ⭐ 여기에 추가! */
+.category-drop-zone h3 {
+    color: #ffd700;
+    font-size: 2rem;             /* 고모음, 중모음, 저모음 글자 크기 */
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
 
 .word-element {
     background: linear-gradient(135deg, #4a90e2, #357abd);
@@ -965,6 +974,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
