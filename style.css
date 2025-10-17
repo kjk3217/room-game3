@@ -304,6 +304,7 @@ body {
 
 .clickable.next-quiz {
     animation: nextQuizGlow 1.5s ease-in-out infinite;
+    border: none;
 }
 
 /* 책은 반짝임 효과 제외 */
@@ -978,6 +979,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
