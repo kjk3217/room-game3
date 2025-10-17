@@ -108,8 +108,8 @@ body {
 }
 
 .game-logo {
-    max-width: 40rem;
-    width: 70%;
+    max-width: 30rem;
+    width: 60%;
     height: auto;
     margin-bottom: 1rem;
     filter: drop-shadow(0 0 20px rgba(255,215,0,0.5));
@@ -974,6 +974,7 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 
 
 
