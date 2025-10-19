@@ -75,6 +75,9 @@ function closeStoryModal() {
 // 엔딩 시퀀스 시작
 function startEndingSequence() {
     stopRoomTimer();
+    
+    // ⭐ 즉시 gameScreen 숨기기 (3번 방이 보이지 않도록)
+    document.getElementById('gameScreen').style.display = 'none';
    
     const fadeOverlay = document.createElement('div');
     fadeOverlay.id = 'fadeOverlay';
@@ -96,7 +99,8 @@ function startEndingSequence() {
     }, 100);
    
     setTimeout(() => {
-        document.getElementById('gameScreen').style.display = 'none';
+        // gameScreen은 이미 숨겨져 있으므로 이 줄은 제거해도 됨
+        // document.getElementById('gameScreen').style.display = 'none';
        
         const endingScreen = document.getElementById('endingScreen');
         endingScreen.style.display = 'flex';
