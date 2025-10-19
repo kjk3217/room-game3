@@ -31,8 +31,7 @@ let puzzleInitialParent = null;
 const transitionVideos = {
     start: 'videos/start_to_room1.mp4',
     room1: 'videos/room1_to_room2.mp4',
-    room2: 'videos/room2_to_room3.mp4',
-    room3: 'videos/room3_to_ending.mp4'
+    room2: 'videos/room2_to_room3.mp4'
 };
 
 // 퀴즈 데이터
@@ -158,5 +157,4 @@ function getRoomQuizzes(roomNum) {
     }
 
 }
-
 
