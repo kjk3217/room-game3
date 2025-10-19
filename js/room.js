@@ -76,55 +76,22 @@ function closeStoryModal() {
 function startEndingSequence() {
     stopRoomTimer();
     
-    // ⭐ 즉시 gameScreen 숨기기 (3번 방이 보이지 않도록)
+    // ⭐ 3번 방 즉시 숨기기
     document.getElementById('gameScreen').style.display = 'none';
-   
-    const fadeOverlay = document.createElement('div');
-    fadeOverlay.id = 'fadeOverlay';
-    fadeOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: black;
-        z-index: 8000;
-        opacity: 0;
-        transition: opacity 2s ease-in-out;
-    `;
-    document.body.appendChild(fadeOverlay);
-   
-    setTimeout(() => {
-        fadeOverlay.style.opacity = '1';
-    }, 100);
-   
-    setTimeout(() => {
-        // gameScreen은 이미 숨겨져 있으므로 이 줄은 제거해도 됨
-        // document.getElementById('gameScreen').style.display = 'none';
-       
-        const endingScreen = document.getElementById('endingScreen');
-        endingScreen.style.display = 'flex';
-        endingScreen.style.opacity = '1';
-        endingScreen.style.transform = 'scale(1.5)';
-        endingScreen.classList.add('active');
-
-        playBackgroundMusic();
-       
-        setTimeout(() => {
-            fadeOverlay.style.opacity = '0';
-           
-            endingScreen.style.transition = 'transform 3s ease-out';
-            endingScreen.style.transform = 'scale(1)';
-           
-            setTimeout(() => {
-                if (fadeOverlay.parentNode) {
-                    fadeOverlay.parentNode.removeChild(fadeOverlay);
-                }
-               
-                createCelebrationEffect();
-               
-                localStorage.setItem('gameCompleted', 'true');
-            }, 2000);
-        }, 500);
-    }, 2000);
+    
+    // ⭐ 엔딩 화면 바로 보여주기
+    const endingScreen = document.getElementById('endingScreen');
+    endingScreen.style.display = 'flex';
+    endingScreen.style.opacity = '1';
+    endingScreen.style.transform = 'scale(1)';  // 줌 효과 제거
+    endingScreen.classList.add('active');
+    
+    // 배경음악 재생
+    playBackgroundMusic();
+    
+    // 색종이 효과
+    createCelebrationEffect();
+    
+    // 게임 완료 저장
+    localStorage.setItem('gameCompleted', 'true');
 }
