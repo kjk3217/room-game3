@@ -403,6 +403,7 @@ function correctAnswerForFinalQuiz() {
     markQuizCompleted(currentQuiz);
     updateUI();
    
+    // 모달 닫기 애니메이션
     const modal = document.getElementById('quizModal');
     modal.style.transition = 'all 0.5s ease-out';
     modal.style.opacity = '0';
@@ -413,9 +414,16 @@ function correctAnswerForFinalQuiz() {
         modal.style.transition = '';
         modal.style.opacity = '';
         modal.style.transform = '';
-       
+        
+        // 타이머 중지
+        stopRoomTimer();
+        
+        // 엔딩 동영상 재생 후 엔딩 화면으로 전환
         setTimeout(() => {
-            startEndingSequence();
+            showTransitionWithVideo('room3', () => {
+                // 동영상 재생이 끝난 후 엔딩 시퀀스 시작
+                startEndingSequence();
+            });
         }, 300);
     }, 500);
 }
@@ -1020,5 +1028,6 @@ function handleTouchEnd(e) {
     draggedTouchElement = null;
 
 }
+
 
 
