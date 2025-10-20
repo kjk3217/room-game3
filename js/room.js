@@ -93,9 +93,9 @@ function startEndingSequence() {
         
         // 축하 효과
         setTimeout(() => {
-            createCelebrationEffect();
             localStorage.setItem('gameCompleted', 'true');
         }, 1000);
     }, 100);
 }
+
 
