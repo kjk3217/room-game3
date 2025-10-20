@@ -16,7 +16,9 @@ function showRoom(roomNum, showStory = true) {
     setTimeout(() => {
         currentRoomElement.classList.add('active');
         if (showStory) {
-            showStoryModal(roomNum);
+            setTimeout(() => {
+                showStoryModal(roomNum);
+            }, 1000);
         } else {
             startRoomTimer();
         }
@@ -99,5 +101,6 @@ function startEndingSequence() {
         }, 1000);
     }, 100);
 }
+
 
 
