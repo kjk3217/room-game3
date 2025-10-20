@@ -74,54 +74,28 @@ function closeStoryModal() {
 
 // 엔딩 시퀀스 시작
 function startEndingSequence() {
-    stopRoomTimer();
-   
-    const fadeOverlay = document.createElement('div');
-    fadeOverlay.id = 'fadeOverlay';
-    fadeOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: black;
-        z-index: 8000;
-        opacity: 0;
-        transition: opacity 2s ease-in-out;
-    `;
-    document.body.appendChild(fadeOverlay);
-   
+    // 게임 화면 숨기기
+    document.getElementById('gameScreen').style.display = 'none';
+    
+    // 엔딩 화면 표시
+    const endingScreen = document.getElementById('endingScreen');
+    endingScreen.style.display = 'flex';
+    endingScreen.style.opacity = '0';
+    endingScreen.classList.add('active');
+    
+    // 페이드인 효과
     setTimeout(() => {
-        fadeOverlay.style.opacity = '1';
-    }, 100);
-   
-    setTimeout(() => {
-        document.getElementById('gameScreen').style.display = 'none';
-       
-        const endingScreen = document.getElementById('endingScreen');
-        endingScreen.style.display = 'flex';
+        endingScreen.style.transition = 'opacity 2s ease-in-out';
         endingScreen.style.opacity = '1';
-        endingScreen.style.transform = 'scale(1.5)';
-        endingScreen.classList.add('active');
-
+        
+        // 배경음악 재생
         playBackgroundMusic();
-       
+        
+        // 축하 효과
         setTimeout(() => {
-            fadeOverlay.style.opacity = '0';
-           
-            endingScreen.style.transition = 'transform 3s ease-out';
-            endingScreen.style.transform = 'scale(1)';
-           
-            setTimeout(() => {
-                if (fadeOverlay.parentNode) {
-                    fadeOverlay.parentNode.removeChild(fadeOverlay);
-                }
-               
-               // createCelebrationEffect();
-               
-                localStorage.setItem('gameCompleted', 'true');
-            }, 2000);
-        }, 500);
-    }, 2000);
-
+            createCelebrationEffect();
+            localStorage.setItem('gameCompleted', 'true');
+        }, 1000);
+    }, 100);
 }
+
