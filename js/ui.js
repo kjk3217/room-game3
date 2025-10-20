@@ -67,60 +67,6 @@ function showMessage(text) {
     }, 1500);
 }
 
-// 축하 효과 생성
-function createCelebrationEffect() {
-    for (let i = 0; i < 50; i++) {
-        createConfetti();
-    }
-   
-    confettiInterval = setInterval(() => {
-        for (let i = 0; i < 10; i++) {
-            createConfetti();
-        }
-    }, 200);
-}
-
-// 색종이 개별 생성
-function createConfetti() {
-    const confetti = document.createElement('div');
-    const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-   
-    confetti.style.cssText = `
-        position: fixed;
-        width: 10px;
-        height: 10px;
-        background: ${randomColor};
-        top: -10px;
-        left: ${Math.random() * 100}vw;
-        z-index: 9999;
-        border-radius: 2px;
-        pointer-events: none;
-        animation: confettiFall ${2 + Math.random() * 3}s linear forwards;
-    `;
-   
-    document.body.appendChild(confetti);
-   
-    if (!document.querySelector('#confettiAnimation')) {
-        const style = document.createElement('style');
-        style.id = 'confettiAnimation';
-        style.textContent = `
-            @keyframes confettiFall {
-                to {
-                    transform: translateY(100vh) rotate(360deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-   
-    setTimeout(() => {
-        if (confetti.parentNode) {
-            confetti.parentNode.removeChild(confetti);
-        }
-    }, 5000);
-}
 
 // 전체 화면 실행 함수
 function requestFullScreen() {
@@ -219,4 +165,5 @@ function showTransitionWithVideo(videoKey, callback) {
             }, 500);
         }
     }, 7000);
+
 }
