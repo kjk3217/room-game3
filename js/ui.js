@@ -143,7 +143,7 @@ function showTransitionWithVideo(videoKey, callback) {
                 console.log('비디오 로드 시간 초과, 기본 전환으로 진행');
                 executeCallback();
             }
-        }, 3000);
+        }, 4000);
        
     } else {
         console.log('비디오 파일 없음, 기본 전환 효과 사용');
@@ -164,6 +164,7 @@ function showTransitionWithVideo(videoKey, callback) {
                 video.src = '';
             }, 500);
         }
-    }, 7000);
+    }, 8000);
 
 }
+
