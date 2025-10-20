@@ -36,13 +36,26 @@ function initTimer() {
 function startRoomTimer() {
     if (isTimerActive) return;
     
-    timeLeft = 420;
+    // 저장된 방 번호 확인
+    const savedRoom = parseInt(localStorage.getItem('lastSavedRoom')) || 1;
+    const savedTime = parseInt(localStorage.getItem('timeLeft'));
+    
+    // 같은 방이고 저장된 시간이 있으면 이어서, 아니면 새로 시작
+    if (savedRoom === currentRoom && savedTime) {
+        timeLeft = savedTime;
+    } else {
+        timeLeft = 420;  // 새로운 방이면 7분으로 리셋
+        localStorage.setItem('timeLeft', 420);
+        localStorage.setItem('lastSavedRoom', currentRoom);
+    }
+    
     isTimerActive = true;
     updateTimerDisplay();
     initTimer();
     
     roomTimer = setInterval(() => {
         timeLeft--;
+        localStorage.setItem('timeLeft', timeLeft);
         updateTimerDisplay();
         
         if (timeLeft <= 120 && tickSound) {
@@ -122,4 +135,7 @@ function gameOver() {
     }, 100);
     
     closeModal();
+
 }
+
+

@@ -35,6 +35,8 @@ function nextRoom() {
         setTimeout(() => {
             currentRoom = nextRoomNum;
             localStorage.setItem('currentRoom', currentRoom);
+            localStorage.setItem('lastSavedRoom', nextRoomNum);  // ← 추가
+            localStorage.setItem('timeLeft', 420);  // ← 추가
             showRoom(currentRoom);
             document.getElementById('nextRoomBtn').style.display = 'none';
             updateUI();
