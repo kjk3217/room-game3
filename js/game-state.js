@@ -17,7 +17,6 @@ let isTimerActive = false;
 let backgroundMusic = null;
 let clickSound = null;
 let soundsLoaded = false;
-let confettiInterval = null;
 
 // 퍼즐 관련 변수
 let puzzlePieces = [];
@@ -158,5 +157,6 @@ function getRoomQuizzes(roomNum) {
     }
 
 }
+
 
 
