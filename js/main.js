@@ -66,18 +66,6 @@ function restartGame() {
     stopRoomTimer();
     stopBackgroundMusic();
    
-    if (confettiInterval) {
-        clearInterval(confettiInterval);
-        confettiInterval = null;
-    }
-   
-    const confettis = document.querySelectorAll('div[style*="confettiFall"]');
-    confettis.forEach(confetti => {
-        if (confetti.parentNode) {
-            confetti.parentNode.removeChild(confetti);
-        }
-    });
-   
     currentRoom = 1;
     completedQuizzes = [];
     currentQuiz = null;
@@ -163,4 +151,5 @@ document.getElementById('quizModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeModal();
     }
+
 });
